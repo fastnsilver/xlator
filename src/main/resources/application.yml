@@ -1,0 +1,10 @@
+# MASTER CONFIGURATION
+***REMOVED***
+# You should update the configuration below , uncommenting email and password and entering appropriate values matching a valid pair of credentials. 
+
+app:
+  frengly:
+    #email: 
+    #password: 
+  defaults:
+    locale: en
