@@ -1,4 +1,4 @@
-package com.fns.xlator;
+package com.fns.xlator.client.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
