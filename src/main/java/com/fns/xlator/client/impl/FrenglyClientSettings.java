@@ -1,5 +1,6 @@
 package com.fns.xlator.client.impl;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -9,8 +10,13 @@ import org.springframework.stereotype.Component;
 public class FrenglyClientSettings {
 
     private String host = "frengly.com";
+
+    @NotEmpty
     private String email;
+
+    @NotEmpty
     private String password;
+
     private int retries = 10;
 
     @Value("${app.defaults.locale}")

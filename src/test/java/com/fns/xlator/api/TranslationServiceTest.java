@@ -1,6 +1,7 @@
 package com.fns.xlator.api;
 
 import com.fns.xlator.App;
+import com.fns.xlator.client.api.TranslationService;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

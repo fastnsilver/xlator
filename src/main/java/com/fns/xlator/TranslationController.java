@@ -1,6 +1,6 @@
 package com.fns.xlator;
 
-import com.fns.xlator.api.TranslationService;
+import com.fns.xlator.client.api.TranslationService;
 import com.fns.xlator.model.ErrorResponse;
 import com.fns.xlator.model.Translation;
 import com.fns.xlator.model.TranslationRequest;

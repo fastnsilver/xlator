@@ -1,6 +1,6 @@
 package com.fns.xlator.client.impl;
 
-import com.fns.xlator.api.TranslationService;
+import com.fns.xlator.client.api.TranslationService;
 import com.fns.xlator.model.Translation;
 
 import org.slf4j.Logger;
@@ -24,6 +24,7 @@ import java.util.MissingResourceException;
 public class FrenglyTranslationService implements TranslationService {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+
     private RestTemplate restTemplate;
     private FrenglyClientSettings settings;
     private CounterService counterService;
