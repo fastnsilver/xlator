@@ -1,7 +1,10 @@
 package com.fns.xlator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -15,6 +18,7 @@ import java.util.MissingResourceException;
 @Service
 public class FrenglyTranslationService implements TranslationService {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private RestTemplate restTemplate;
     private FrenglyClientSettings settings;
     private CounterService counterService;
@@ -27,18 +31,22 @@ public class FrenglyTranslationService implements TranslationService {
         this.counterService = counterService;
     }
 
+    protected void validateTranslationArguments(String source, String target, String text) {
+        Assert.hasText(target, "[Assertion failed] - Target locale code must not be null, empty or blank!");
+        Assert.hasText(text, "[Assertion failed] - Text to translate must not be null, empty or blank!");
+        Assert.isTrue(isValidLocale(source), "[Assertion failed] - Source is not a valid Locale!");
+        Assert.isTrue(isValidLocale(target), "[Assertion failed] - Target is not a valid Locale!");
+    }
+
     @Override
     @Cacheable(cacheNames = "translations")
     public Translation obtainTranslation(String src, String target, String text) {
         counterService.increment("services.frengly.translation.invoked");
-        Assert.hasText(target, "[Assertion failed] - Target locale code must not be null, empty or blank!");
-        Assert.hasText(text, "[Assertion failed] - Text to translate must not be null, empty or blank!");
         String source = src;
         if (source == null) {
             source = settings.getDefaultSource();
         }
-        Assert.isTrue(isValidLocale(src), "[Assertion failed] - Source is not a valid Locale!");
-        Assert.isTrue(isValidLocale(target), "[Assertion failed] - Target is not a valid Locale!");
+        validateTranslationArguments(source, target, text);
         if (src.equals(target)) {
             return new Translation(src, target, text, text);
         }
@@ -56,7 +64,15 @@ public class FrenglyTranslationService implements TranslationService {
             .build()
                 .encode()
                 .toUri();
-        return restTemplate.getForObject(uri, Translation.class);
+        FrenglyTranslation ft = restTemplate.getForObject(uri, FrenglyTranslation.class);
+        return new Translation(ft.getSrc(), ft.getDest(), ft.getText(), ft.getTranslation());
+    }
+
+    @Override
+    @CacheEvict("translations")
+    public void evictTranslation(String source, String target, String text) {
+        counterService.increment("services.frengly.cacheKey.eviction");
+        log.info("Key w/ source [{}], target [{}], and text [{}] removed from cache!");
     }
 
     private Locale parseLocale(String locale) {
@@ -81,4 +97,5 @@ public class FrenglyTranslationService implements TranslationService {
             return false;
         }
     }
+
 }
