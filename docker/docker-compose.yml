@@ -109,4 +109,4 @@ xlator:
   links:
     - graphite
   env_file:
-    - ./xlator.env
+    - ./xlator/xlator.env
