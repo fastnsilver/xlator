@@ -35,7 +35,7 @@ Note that frengly.com throttles requests, so intermittent HTTP 5xx responses are
 * Inputs: A [TranslationRequest](https://github.com/fastnsilver/xlator/blob/master/src/main/java/com/fns/xlator/TranslationRequest.java) array, this form is preferred for multi-word text translations and/or when you want to perform translations on different combinations of source, target and text input parameters
 * Output: translations
 
-`DELETE /translations/source/{src}/target/{target}/text/{text}`
+`DELETE /translation/source/{src}/target/{target}/text/{text}`
 
 * Inputs: cache key comprised of source locale, target locale and text that was previously translated
 * Output: entry is removed from cache provider
