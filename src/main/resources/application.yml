@@ -8,3 +8,5 @@ app:
     #password: 
   defaults:
     locale: en
+  info:
+    version: @project.version@
