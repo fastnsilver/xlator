@@ -6,30 +6,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder(value = { "source", "target", "text", "translation" })
-public class Translation {
+@JsonPropertyOrder(value = { "src", "dest", "text", "translation" })
+public class FrenglyTranslation {
 
-    private String source;
-    private String target;
+    private String src;
+    private String dest;
     private String text;
     private String translation;
 
     @JsonCreator
-    public Translation(@JsonProperty("source") String source, @JsonProperty("target") String target,
+    public FrenglyTranslation(@JsonProperty("src") String src, @JsonProperty("dest") String dest,
             @JsonProperty("text") String text, @JsonProperty("translation") String translation) {
-        this.source = source;
-        this.target = target;
+        this.src = src;
+        this.dest = dest;
         this.text = text;
         this.translation = translation;
     }
 
 
-    public String getSource() {
-        return source;
+    public String getSrc() {
+        return src;
     }
 
-    public String getTarget() {
-        return target;
+    public String getDest() {
+        return dest;
     }
 
     public String getText() {
