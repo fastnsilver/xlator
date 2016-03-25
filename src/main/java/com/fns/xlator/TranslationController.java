@@ -109,6 +109,7 @@ public class TranslationController {
     public ResponseEntity<?> invalidateCacheKey(@PathVariable("src") String source,
             @PathVariable("target") String target, @PathVariable("text") String text) {
         translationService.evictTranslation(source, target, text);
+        log.info(String.format("Evicted cache key for /source/%s/target/%s/text/%s", source, target, text));
         return ResponseEntity.noContent().build();
     }
 
