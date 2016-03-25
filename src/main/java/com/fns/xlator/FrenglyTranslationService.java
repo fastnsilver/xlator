@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -31,50 +32,6 @@ public class FrenglyTranslationService implements TranslationService {
         this.counterService = counterService;
     }
 
-    protected void validateTranslationArguments(String source, String target, String text) {
-        Assert.hasText(target, "[Assertion failed] - Target locale code must not be null, empty or blank!");
-        Assert.hasText(text, "[Assertion failed] - Text to translate must not be null, empty or blank!");
-        Assert.isTrue(isValidLocale(source), "[Assertion failed] - Source is not a valid Locale!");
-        Assert.isTrue(isValidLocale(target), "[Assertion failed] - Target is not a valid Locale!");
-    }
-
-    @Override
-    @Cacheable(cacheNames = "translations")
-    public Translation obtainTranslation(String src, String target, String text) {
-        counterService.increment("services.frengly.translation.invoked");
-        String source = src;
-        if (source == null) {
-            source = settings.getDefaultSource();
-        }
-        validateTranslationArguments(source, target, text);
-        if (src.equals(target)) {
-            return new Translation(src, target, text, text);
-        }
-        URI uri = UriComponentsBuilder
-            .newInstance()
-                .scheme("http")
-                .host(settings.getHost())
-                .port(80)
-                .queryParam("src", source)
-                .queryParam("dest", target)
-                .queryParam("text", text)
-                .queryParam("email", settings.getEmail())
-                .queryParam("password", settings.getPassword())
-                .queryParam("outformat", "json")
-            .build()
-                .encode()
-                .toUri();
-        FrenglyTranslation ft = restTemplate.getForObject(uri, FrenglyTranslation.class);
-        return new Translation(ft.getSrc(), ft.getDest(), ft.getText(), ft.getTranslation());
-    }
-
-    @Override
-    @CacheEvict("translations")
-    public void evictTranslation(String source, String target, String text) {
-        counterService.increment("services.frengly.cacheKey.eviction");
-        log.info("Key w/ source [{}], target [{}], and text [{}] removed from cache!");
-    }
-
     private Locale parseLocale(String locale) {
         String[] parts = locale.split("_");
         switch (parts.length) {
@@ -96,6 +53,72 @@ public class FrenglyTranslationService implements TranslationService {
         } catch (MissingResourceException e) {
             return false;
         }
+    }
+
+    protected void validateTranslationArguments(String source, String target, String text) {
+        Assert.hasText(target, "[Assertion failed] - Target locale code must not be null, empty or blank!");
+        Assert.hasText(text, "[Assertion failed] - Text to translate must not be null, empty or blank!");
+        Assert.isTrue(isValidLocale(source), String.format("[Assertion failed] - Source [%s] is not a valid Locale!", source));
+        Assert.isTrue(isValidLocale(target), String.format("[Assertion failed] - Target [%s] is not a valid Locale!", target));
+    }
+
+    protected FrenglyTranslation tryRequest(String source, String target, String text, int retries) {
+        URI uri = UriComponentsBuilder
+                .newInstance()
+                .scheme("http")
+                .host(settings.getHost())
+                .port(80)
+                .queryParam("src", source)
+                .queryParam("dest", target)
+                .queryParam("text", text)
+                .queryParam("email", settings.getEmail())
+                .queryParam("password", settings.getPassword())
+                .queryParam("outformat", "json")
+                .build()
+                .encode()
+                .toUri();
+        log.info(String.format("Obtaining translation from %s", uri.toASCIIString()));
+
+        FrenglyTranslation result = null;
+        for (int i = 0; i < retries; i++) {
+            try {
+                result = restTemplate.getForObject(uri, FrenglyTranslation.class);
+                break;
+            } catch (RestClientException e) {
+                try {
+                    Thread.sleep((i + 1) * 500);
+                } catch (InterruptedException ie) {
+                    // do nothing
+                }
+            }
+            if (i == retries - 1) {
+                result = new FrenglyTranslation(source, target, text, "Could not obtain translation!"); // FIXME i18n response
+            }
+        }
+        return result;
+    }
+
+    @Override
+    @Cacheable(cacheNames = "translations")
+    public Translation obtainTranslation(String src, String target, String text) {
+        counterService.increment("services.frengly.translation.invoked");
+        String source = src;
+        if (source == null) {
+            source = settings.getDefaultSource();
+        }
+        validateTranslationArguments(source, target, text);
+        if (src.equals(target)) {
+            return new Translation(src, target, text, text);
+        }
+        FrenglyTranslation ft = tryRequest(source, target, text, settings.getRetries());
+        return new Translation(ft.getSrc(), ft.getDest(), ft.getText(), ft.getTranslation());
+    }
+
+    @Override
+    @CacheEvict("translations")
+    public void evictTranslation(String source, String target, String text) {
+        counterService.increment("services.frengly.cacheKey.eviction");
+        log.info("Key w/ source [{}], target [{}], and text [{}] removed from cache!");
     }
 
 }
