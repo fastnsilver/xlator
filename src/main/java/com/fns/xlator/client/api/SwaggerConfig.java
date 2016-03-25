@@ -1,4 +1,4 @@
-package com.fns.xlator.api;
+package com.fns.xlator.client.api;
 
 import static springfox.documentation.builders.PathSelectors.regex;
 import static springfox.documentation.schema.AlternateTypeRules.newRule;

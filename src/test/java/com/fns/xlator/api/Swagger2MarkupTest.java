@@ -1,7 +1,9 @@
-package com.fns.xlator;
+package com.fns.xlator.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fns.xlator.App;
 
 import org.junit.Before;
 import org.junit.Test;
