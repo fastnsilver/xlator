@@ -2,11 +2,17 @@
 
 Translation service prototype that is backed by either an in-memory or a hosted Elasticache (Redis) instance
 
+Current service implementation makes requests of [frengly](http://frengly.com).
+
+You will need to register for an account and add `app.frengly.email` and `app.frengly.password` to [application.yml](https://raw.githubusercontent.com/fastnsilver/xlator/master/src/main/resources/application.yml).
+
+Note that frengly.com throttles requests, so intermittent HTTP 5xx responses are to be expected.
+
 ## Service Endpoints
 
 `GET /translation/source/{src}/target/{target}/text/{text}`
 
-* Inputs: source locale, target locale and text to translate
+* Inputs: source [locale](https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html), target locale and text to translate
 * Output: translation
 
 `GET /translation/target/{target}/text/{text}` 
@@ -26,7 +32,7 @@ Translation service prototype that is backed by either an in-memory or a hosted 
 
 `POST /translations/`
 
-* Inputs: TranslationRequest[]
+* Inputs: A [TranslationRequest](https://github.com/fastnsilver/xlator/blob/master/src/main/java/com/fns/xlator/TranslationRequest.java) array, this form is preferred for multi-word text translations and/or when you want to perform translations on different combinations of source, target and text input parameters
 * Output: translations
 
 `DELETE /translations/source/{src}/target/{target}/text/{text}`
@@ -84,19 +90,13 @@ where `x.x.x` is a version like `0.0.1-SNAPSHOT`
 
 ## Roadmap
 
-Current service implementation makes requests of [frengly](http://frengly.com).
-
-You will need to register for an account and add `app.frengly.email` and `app.frengly.password` to [application.yml](https://raw.githubusercontent.com/fastnsilver/xlator/master/src/main/resources/application.yml).
-
-Note that frengly.com throttles requests, so intermittent HTTP responses are to be expected.
-
 Still left to explore...
 
-a) the ability to warm the cache from an external file
+a) The ability to warm the cache from an external file
 
-b) completing integration w/ Elasticache  (@see aws Maven profile in POM)
+b) Completing integration w/ Elasticache  (@see aws Maven profile in POM)
 
-c) listening to an event from Redis, Kafka or Kinesis instead of exposing an invalidate HTTP end-point
+c) Listening to an event from Redis, Kafka or Kinesis instead of exposing an invalidate HTTP end-point
 
-d) alternate service implementation backed by Google Translate [API](https://cloud.google.com/translate/v2/using_rest)
+d) Authoring an alternate service implementation backed by Google Translate [API](https://cloud.google.com/translate/v2/using_rest)
 
