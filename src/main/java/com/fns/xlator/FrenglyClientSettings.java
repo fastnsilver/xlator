@@ -11,6 +11,7 @@ public class FrenglyClientSettings {
     private String host = "frengly.com";
     private String email;
     private String password;
+    private int retries = 10;
 
     @Value("${app.defaults.locale}")
     private String defaultSource;
@@ -41,5 +42,9 @@ public class FrenglyClientSettings {
 
     public String getDefaultSource() {
         return defaultSource;
+    }
+
+    public int getRetries() {
+        return retries;
     }
 }
