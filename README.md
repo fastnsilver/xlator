@@ -1,4 +1,10 @@
 # xlator
+[![Build Status](https://travis-ci.org/fastnsilver/xlator.svg)](https://travis-ci.org/fastnsilver/xlator)
+[![codecov.io](https://codecov.io/github/fastnsilver/xlator/coverage.svg?branch=master)](https://codecov.io/github/fastnsilver/xlator?branch=master)
+[![Apache License 2](https://img.shields.io/badge/license-ASF2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+![codecov.io](https://codecov.io/github/fastnsilver/xlator/branch.svg?branch=master)
+
 
 Translation service prototype that is backed by either an in-memory or a hosted Elasticache (Redis) instance
 
@@ -39,6 +45,7 @@ Note that frengly.com throttles requests, so intermittent HTTP 5xx responses are
 
 * Inputs: cache key comprised of source locale, target locale and text that was previously translated
 * Output: entry is removed from cache provider
+
 
 ## Developer Notes
 
@@ -86,6 +93,124 @@ $ java -jar xlator-x.x.x.jar
 ```
 
 where `x.x.x` is a version like `0.0.1-SNAPSHOT`
+
+
+#### with Docker
+
+Assuming you have installed VirtualBox, Docker Machine, Docker Compose and Docker.
+
+If not, it's highly recommended (on a Mac) to install each via [Homebrew](http://brew.sh/) with
+
+```
+brew tap caskroom/cask
+brew install brew-cask
+brew cask install virtualbox
+
+brew install docker-machine
+brew install docker-compose
+brew install docker
+```
+
+The instruction below provisions a Docker host named `dev` with 2 CPU, 10Gb RAM and 40Gb disk space
+
+```
+docker-machine create --driver virtualbox --virtualbox-cpu-count "2" --virtualbox-disk-size "40000" --virtualbox-memory "10240" dev
+```
+
+To begin using it
+
+```
+docker-machine env dev
+```
+
+
+##### Build images
+
+```
+mvn clean install
+```
+
+
+##### Publish images
+
+Assumes proper authentication credentials have been added to `$HOME/.m2/settings.xml`. See:
+
+* [Autenticating with Private Registries](https://github.com/spotify/docker-maven-plugin#authenticating-with-private-registries)
+
+```
+mvn clean install -DpushImage
+```
+
+
+##### Pull images
+
+Visit [Dockerhub](https://hub.docker.com/u/fastnsilver/)
+
+Pull the xlator image
+
+
+##### Run images
+
+```
+cd docker
+***REMOVED***
+```
+
+###### Running a local development environment
+
+@see https://forums.docker.com/t/using-localhost-for-to-access-running-container/3148
+
+On a Mac we cannot access running Docker containers from localhost.
+
+After running `docker-machine ip {env}` where `{env}` is your instance of a docker-machine, add an entry in `/etc/hosts` that maps `DOCKER_HOST` IP address to a memorable hostname.
+
+
+##### Work with images
+
+Services are accessible via the Docker host (or IP address) and port 
+
+Service           |  Port
+------------------|-------
+Graphite          | 8000
+Grafana           | 3000
+Xlator            | 80
+MySQL             | 3306
+Elasticsearch     | 9200
+Logstash          | 5000
+Kibana            | 5601
+CAdvisor          | 9080
+
+
+##### Stop images (and remove them)
+
+```
+docker-compose stop
+docker-compose rm -f
+```
+
+
+### Working with Maven Site 
+
+#### Stage
+
+```
+mvn site site:stage -Pdocumentation
+```
+
+#### Publish
+
+Assumes a `gh-pages` (orphan) branch has been set up in advance.  In addition, appropriate authentication credentials have been declared in `$HOME/.m2/settings.xml`. See:
+
+* [Creating Project Pages manually](https://help.github.com/articles/creating-project-pages-manually/)
+* [Security and Deployment Settings](http://maven.apache.org/guides/mini/guide-deployment-security-settings.html)
+
+```
+mvn scm-publish:publish-scm -Pdocumentation
+```
+
+#### Review
+
+* [Maven Site](http://fastnsilver.github.io/xlator/)
 
 
 ## Roadmap

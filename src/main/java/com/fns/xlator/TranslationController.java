@@ -1,5 +1,11 @@
 package com.fns.xlator;
 
+import com.fns.xlator.api.TranslationService;
+import com.fns.xlator.model.ErrorResponse;
+import com.fns.xlator.model.Translation;
+import com.fns.xlator.model.TranslationRequest;
+import com.fns.xlator.model.Translations;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

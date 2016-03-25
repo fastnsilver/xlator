@@ -1,0 +1,112 @@
+# DOCKER COMPOSE CONFIGURATION
+
+
+## INFRASTRUCTURE SERVICES
+
+### PERSISTENT DATA VOLUME
+
+# On a Mac, execute 
+#    dscacheutil -q user | grep -A 3 -B 2 -e uid:\ 5'[0-9][0-9]'
+# in a Terminal instance to obtain the uid:gid for the account that runs your docker-machine instance
+# You will want to edit the command below if your uid:gid differ
+data:
+  image: busybox
+  command: "mkdir /data && chown 502:20 /data && chmod 700 /data"
+
+### KIBANA
+kibana:
+  image: kibana
+  links:
+    - elasticsearch
+  ports:
+    - 5601:5601
+    
+### ELASTICSEARCH
+elasticsearch:
+  image: elasticsearch
+  ports:
+    - 9200:9200
+
+### REDIS
+redis:
+  image: redis
+  ports:
+    - 6379:6379
+
+### LOGSTASH
+logstash:
+  image: logstash
+  environment:
+    - ES_HEAP_SIZE=2g
+  command: 'logstash -f /logstash.conf -v'
+  volumes:
+    - ./monitoring/logstash.conf:/logstash.conf
+  links:
+    - redis
+    - elasticsearch
+
+### LOGSPOUT
+
+# Thank you R. Toma 
+# (@see https://github.com/rtoma/logspout-redis-logstash/blob/master/example/docker-compose.yml)
+
+logspout:
+  image: rtoma/logspout-redis-logstash
+  command: 'redis://redis'
+  env_file:
+    - ./monitoring/logspout.env
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+  links:
+    - redis
+    
+### GRAPHITE, STATSD
+graphite:
+  image: hopsoft/graphite-statsd
+  ports:
+    - 8000:80
+    - 2003:2003
+    - 8125:8125
+    - 8125:8125/udp
+    - 8126:8126
+
+### GRAFANA
+grafana:
+  image: grafana/grafana
+  ports:
+    - 3000:3000
+  env_file:
+    - ./monitoring/grafana.env
+  links:
+    - graphite
+    
+### CADVISOR
+cadvisor:
+  image: google/cadvisor:latest
+  volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+  ports:
+    - 9080:8080
+    
+### WATCHTOWER
+
+watchtower:
+  image: centurylink/watchtower
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+
+
+## CORE SERVICES
+
+### XLATOR SERVICE
+xlator:
+  image: fastnsilver/xlator
+  ports:
+    - 80:8080
+  links:
+    - graphite
+  env_file:
+    - ./xlator.env
