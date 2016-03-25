@@ -92,7 +92,7 @@ where `x.x.x` is a version like `0.0.1-SNAPSHOT`
 
 Still left to explore...
 
-a) The ability to warm the cache from an external file
+a) The ability to warm the cache from an external file (e.g., via `redis-cli` to [Elasticache Redis](https://loutilities.wordpress.com/2015/03/23/fastest-way-to-warm-an-aws-redis-elasticache-with-json-data/))
 
 b) Completing integration w/ Elasticache  (@see aws Maven profile in POM)
 
