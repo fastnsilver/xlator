@@ -1,4 +1,4 @@
-package com.fns.xlator;
+package com.fns.xlator.client.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

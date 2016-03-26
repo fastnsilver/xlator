@@ -1,4 +1,7 @@
-package com.fns.xlator;
+package com.fns.xlator.client.impl;
+
+import com.fns.xlator.client.api.TranslationService;
+import com.fns.xlator.model.Translation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
@@ -20,6 +24,7 @@ import java.util.MissingResourceException;
 public class FrenglyTranslationService implements TranslationService {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+
     private RestTemplate restTemplate;
     private FrenglyClientSettings settings;
     private CounterService counterService;
@@ -49,7 +54,7 @@ public class FrenglyTranslationService implements TranslationService {
     private boolean isValidLocale(String code) {
         try {
             Locale locale = parseLocale(code);
-            return locale.getISO3Language() != null && locale.getISO3Country() != null;
+            return Arrays.asList(Locale.getAvailableLocales()).contains(locale);
         } catch (MissingResourceException e) {
             return false;
         }

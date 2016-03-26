@@ -1,4 +1,4 @@
-package com.fns.xlator;
+package com.fns.xlator.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -6,20 +6,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder(value = { "source", "target", "text" })
-public class TranslationRequest {
+@JsonPropertyOrder(value = { "source", "target", "text", "translation" })
+public class Translation {
 
     private String source;
     private String target;
     private String text;
+    private String translation;
 
     @JsonCreator
-    public TranslationRequest(@JsonProperty("source") String source, @JsonProperty("target") String target,
-            @JsonProperty("text") String text) {
+    public Translation(@JsonProperty("source") String source, @JsonProperty("target") String target,
+            @JsonProperty("text") String text, @JsonProperty("translation") String translation) {
         this.source = source;
         this.target = target;
         this.text = text;
+        this.translation = translation;
     }
+
 
     public String getSource() {
         return source;
@@ -31,6 +34,10 @@ public class TranslationRequest {
 
     public String getText() {
         return text;
+    }
+
+    public String getTranslation() {
+        return translation;
     }
 
 }
