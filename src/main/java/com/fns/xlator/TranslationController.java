@@ -32,10 +32,12 @@ public class TranslationController {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private TranslationService translationService;
     private String defaultLocale;
+    private int maximumTranslations;
 
     @Autowired
     public TranslationController(TranslationService translationService,
-            @Value("${app.defaults.locale}") String defaultLocale) {
+            @Value("${app.defaults.locale}") String defaultLocale,
+            @Value("${app.limits.translationsPerRequest}") int maximumTranslations) {
         this.translationService = translationService;
         this.defaultLocale = defaultLocale;
     }
@@ -79,8 +81,8 @@ public class TranslationController {
             HttpServletRequest request) {
         List<Translation> translations = new ArrayList<>();
         List<ErrorResponse> errors = new ArrayList<>();
-        Assert.isTrue(translationRequests.length <= 100,
-                "[Assertion failed] - No more than 100 translations may be requested at once!");
+        Assert.isTrue(translationRequests.length <= maximumTranslations, String.format(
+                "[Assertion failed] - No more than %d translations may be requested at once!", maximumTranslations));
         for (TranslationRequest tr : translationRequests) {
             try {
                 translations.add(translationService.obtainTranslation(tr.getSource(), tr.getTarget(), tr.getText()));
@@ -98,7 +100,8 @@ public class TranslationController {
         List<Translation> translations = new ArrayList<>();
         List<ErrorResponse> errors = new ArrayList<>();
         List<String> t = Arrays.asList(targets.split("\\s*,\\s*"));
-        Assert.isTrue(t.size() <= 100, "[Assertion failed] - No more than 100 translations may be requested at once!");
+        Assert.isTrue(t.size() <= maximumTranslations, String.format(
+                "[Assertion failed] - No more than %d translations may be requested at once!", maximumTranslations));
         for (String target : t) {
             try {
                 translations.add(translationService.obtainTranslation(source, target, text));
