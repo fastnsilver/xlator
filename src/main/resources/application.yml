@@ -10,3 +10,5 @@ app:
     locale: en
   info:
     version: @project.version@
+  limits:
+    translationsPerRequest: 50

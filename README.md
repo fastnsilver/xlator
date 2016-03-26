@@ -36,7 +36,7 @@ Note that frengly.com throttles requests, so intermittent HTTP 5xx responses are
 * Inputs: comma-separated target locales and text to translate
 * Output: translations (one per target)
 
-`POST /translations/`
+`POST /translation/`
 
 * Inputs: A [TranslationRequest](https://github.com/fastnsilver/xlator/blob/master/src/main/java/com/fns/xlator/TranslationRequest.java) array, this form is preferred for multi-word text translations and/or when you want to perform translations on different combinations of source, target and text input parameters
 * Output: translations
