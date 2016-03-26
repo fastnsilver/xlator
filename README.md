@@ -19,7 +19,7 @@ Note that frengly.com throttles requests, so intermittent HTTP 5xx responses are
 `GET /translation/source/{src}/target/{target}/text/{text}`
 
 * Inputs: source [locale](https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html), target locale and text to translate
-* Output: translation
+* Output: [translation](https://github.com/fastnsilver/xlator/blob/master/src/main/java/com/fns/xlator/model/Translation.java)
 
 `GET /translation/target/{target}/text/{text}` 
 
