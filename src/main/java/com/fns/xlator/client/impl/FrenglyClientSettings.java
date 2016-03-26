@@ -12,10 +12,10 @@ public class FrenglyClientSettings {
     private String host = "frengly.com";
 
     @NotEmpty
-    private String email;
+    private String email = "change@me.com";
 
     @NotEmpty
-    private String password;
+    private String password = "changeme";
 
     private int retries = 10;
 
