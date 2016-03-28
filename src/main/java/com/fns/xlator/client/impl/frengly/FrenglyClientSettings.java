@@ -1,11 +1,9 @@
-package com.fns.xlator.client.impl;
+package com.fns.xlator.client.impl.frengly;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-@Component
 @ConfigurationProperties(prefix = "app.frengly")
 public class FrenglyClientSettings {
 
@@ -19,7 +17,7 @@ public class FrenglyClientSettings {
 
     private int retries = 10;
 
-    @Value("${app.defaults.locale}")
+    @Value("${app.defaults.locale:en}")
     private String defaultSource;
 
     public String getHost() {
