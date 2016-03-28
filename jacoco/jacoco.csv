@@ -8,10 +8,11 @@ xlator,com.fns.xlator.model,Translation,27,0,0,0,10,0,5,0,5,0
 xlator,com.fns.xlator.model,TranslationRequest,21,0,0,0,8,0,4,0,4,0
 xlator,com.fns.xlator.model,ErrorResponse,30,0,0,0,11,0,6,0,6,0
 xlator,com.fns.xlator.model,Translations,15,0,0,0,6,0,3,0,3,0
+xlator,com.fns.xlator.client.api,CacheService,9,11,0,0,3,4,1,1,1,1
 xlator,com.fns.xlator.client.api,SwaggerConfig,0,77,0,0,0,19,0,3,0,3
 xlator,com.fns.xlator.client.config,ClientConfig,0,80,0,4,0,19,0,5,0,3
 xlator,com.fns.xlator.client.impl,FrenglyTranslation,27,0,0,0,10,0,5,0,5,0
 xlator,com.fns.xlator.client.impl,FrenglyClientSettings,13,29,0,0,5,11,4,5,4,5
-xlator,com.fns.xlator.client.impl,FrenglyTranslationService,233,54,10,2,42,16,9,5,2,5
+xlator,com.fns.xlator.client.impl,FrenglyTranslationService,224,54,10,2,39,16,8,5,1,5
 xlator,com.fns.xlator,TranslationController,243,14,8,0,38,5,13,1,9,1
 xlator,com.fns.xlator,App,5,3,0,0,2,1,1,1,1,1

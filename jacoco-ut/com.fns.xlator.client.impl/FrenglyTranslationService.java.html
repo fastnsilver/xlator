@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -23,7 +22,7 @@ import java.util.MissingResourceException;
 @Service
 public class FrenglyTranslationService implements TranslationService {
 
-<span class="fc" id="L26">    private final Logger log = LoggerFactory.getLogger(getClass());</span>
+<span class="fc" id="L25">    private final Logger log = LoggerFactory.getLogger(getClass());</span>
 
     private RestTemplate restTemplate;
     private FrenglyClientSettings settings;
@@ -31,100 +30,93 @@ public class FrenglyTranslationService implements TranslationService {
 
     @Autowired
     public FrenglyTranslationService(RestTemplate restTemplate, FrenglyClientSettings settings,
-<span class="fc" id="L34">            CounterService counterService) {</span>
-<span class="fc" id="L35">        this.restTemplate = restTemplate;</span>
-<span class="fc" id="L36">        this.settings = settings;</span>
-<span class="fc" id="L37">        this.counterService = counterService;</span>
-<span class="fc" id="L38">    }</span>
+<span class="fc" id="L33">            CounterService counterService) {</span>
+<span class="fc" id="L34">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L35">        this.settings = settings;</span>
+<span class="fc" id="L36">        this.counterService = counterService;</span>
+<span class="fc" id="L37">    }</span>
 
     private Locale parseLocale(String locale) {
-<span class="fc" id="L41">        String[] parts = locale.split(&quot;_&quot;);</span>
-<span class="pc bpc" id="L42" title="3 of 4 branches missed.">        switch (parts.length) {</span>
+<span class="fc" id="L40">        String[] parts = locale.split(&quot;_&quot;);</span>
+<span class="pc bpc" id="L41" title="3 of 4 branches missed.">        switch (parts.length) {</span>
             case 3:
-<span class="nc" id="L44">                return new Locale(parts[0], parts[1], parts[2]);</span>
+<span class="nc" id="L43">                return new Locale(parts[0], parts[1], parts[2]);</span>
             case 2:
-<span class="nc" id="L46">                return new Locale(parts[0], parts[1]);</span>
+<span class="nc" id="L45">                return new Locale(parts[0], parts[1]);</span>
             case 1:
-<span class="fc" id="L48">                return new Locale(parts[0]);</span>
+<span class="fc" id="L47">                return new Locale(parts[0]);</span>
             default:
-<span class="nc" id="L50">                throw new IllegalArgumentException(&quot;Invalid locale: &quot; + locale);</span>
+<span class="nc" id="L49">                throw new IllegalArgumentException(&quot;Invalid locale: &quot; + locale);</span>
         }
     }
 
     private boolean isValidLocale(String code) {
         try {
-<span class="fc" id="L56">            Locale locale = parseLocale(code);</span>
-<span class="fc" id="L57">            return Arrays.asList(Locale.getAvailableLocales()).contains(locale);</span>
-<span class="nc" id="L58">        } catch (MissingResourceException e) {</span>
-<span class="nc" id="L59">            return false;</span>
+<span class="fc" id="L55">            Locale locale = parseLocale(code);</span>
+<span class="fc" id="L56">            return Arrays.asList(Locale.getAvailableLocales()).contains(locale);</span>
+<span class="nc" id="L57">        } catch (MissingResourceException e) {</span>
+<span class="nc" id="L58">            return false;</span>
         }
     }
 
     protected void validateTranslationArguments(String source, String target, String text) {
-<span class="fc" id="L64">        Assert.hasText(target, &quot;[Assertion failed] - Target locale code must not be null, empty or blank!&quot;);</span>
-<span class="fc" id="L65">        Assert.hasText(text, &quot;[Assertion failed] - Text to translate must not be null, empty or blank!&quot;);</span>
-<span class="nc" id="L66">        Assert.isTrue(isValidLocale(source), String.format(&quot;[Assertion failed] - Source [%s] is not a valid Locale!&quot;, source));</span>
-<span class="nc" id="L67">        Assert.isTrue(isValidLocale(target), String.format(&quot;[Assertion failed] - Target [%s] is not a valid Locale!&quot;, target));</span>
-<span class="nc" id="L68">    }</span>
+<span class="fc" id="L63">        Assert.hasText(target, &quot;[Assertion failed] - Target locale code must not be null, empty or blank!&quot;);</span>
+<span class="fc" id="L64">        Assert.hasText(text, &quot;[Assertion failed] - Text to translate must not be null, empty or blank!&quot;);</span>
+<span class="nc" id="L65">        Assert.isTrue(isValidLocale(source), String.format(&quot;[Assertion failed] - Source [%s] is not a valid Locale!&quot;, source));</span>
+<span class="nc" id="L66">        Assert.isTrue(isValidLocale(target), String.format(&quot;[Assertion failed] - Target [%s] is not a valid Locale!&quot;, target));</span>
+<span class="nc" id="L67">    }</span>
 
     protected FrenglyTranslation tryRequest(String source, String target, String text, int retries) {
         URI uri = UriComponentsBuilder
-<span class="nc" id="L72">                .newInstance()</span>
-<span class="nc" id="L73">                .scheme(&quot;http&quot;)</span>
-<span class="nc" id="L74">                .host(settings.getHost())</span>
-<span class="nc" id="L75">                .port(80)</span>
-<span class="nc" id="L76">                .queryParam(&quot;src&quot;, source)</span>
-<span class="nc" id="L77">                .queryParam(&quot;dest&quot;, target)</span>
-<span class="nc" id="L78">                .queryParam(&quot;text&quot;, text)</span>
-<span class="nc" id="L79">                .queryParam(&quot;email&quot;, settings.getEmail())</span>
-<span class="nc" id="L80">                .queryParam(&quot;password&quot;, settings.getPassword())</span>
-<span class="nc" id="L81">                .queryParam(&quot;outformat&quot;, &quot;json&quot;)</span>
-<span class="nc" id="L82">                .build()</span>
-<span class="nc" id="L83">                .encode()</span>
-<span class="nc" id="L84">                .toUri();</span>
-<span class="nc" id="L85">        log.info(String.format(&quot;Obtaining translation from %s&quot;, uri.toASCIIString()));</span>
+<span class="nc" id="L71">                .newInstance()</span>
+<span class="nc" id="L72">                .scheme(&quot;http&quot;)</span>
+<span class="nc" id="L73">                .host(settings.getHost())</span>
+<span class="nc" id="L74">                .port(80)</span>
+<span class="nc" id="L75">                .queryParam(&quot;src&quot;, source)</span>
+<span class="nc" id="L76">                .queryParam(&quot;dest&quot;, target)</span>
+<span class="nc" id="L77">                .queryParam(&quot;text&quot;, text)</span>
+<span class="nc" id="L78">                .queryParam(&quot;email&quot;, settings.getEmail())</span>
+<span class="nc" id="L79">                .queryParam(&quot;password&quot;, settings.getPassword())</span>
+<span class="nc" id="L80">                .queryParam(&quot;outformat&quot;, &quot;json&quot;)</span>
+<span class="nc" id="L81">                .build()</span>
+<span class="nc" id="L82">                .encode()</span>
+<span class="nc" id="L83">                .toUri();</span>
+<span class="nc" id="L84">        log.info(String.format(&quot;Obtaining translation from %s&quot;, uri.toASCIIString()));</span>
 
-<span class="nc" id="L87">        FrenglyTranslation result = null;</span>
-<span class="nc bnc" id="L88" title="All 2 branches missed.">        for (int i = 0; i &lt; retries; i++) {</span>
+<span class="nc" id="L86">        FrenglyTranslation result = null;</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        for (int i = 0; i &lt; retries; i++) {</span>
             try {
-<span class="nc" id="L90">                result = restTemplate.getForObject(uri, FrenglyTranslation.class);</span>
-<span class="nc" id="L91">                break;</span>
-<span class="nc" id="L92">            } catch (RestClientException e) {</span>
+<span class="nc" id="L89">                result = restTemplate.getForObject(uri, FrenglyTranslation.class);</span>
+<span class="nc" id="L90">                break;</span>
+<span class="nc" id="L91">            } catch (RestClientException e) {</span>
                 try {
-<span class="nc" id="L94">                    Thread.sleep((i + 1) * 500);</span>
-<span class="nc" id="L95">                } catch (InterruptedException ie) {</span>
+<span class="nc" id="L93">                    Thread.sleep((i + 1) * 500);</span>
+<span class="nc" id="L94">                } catch (InterruptedException ie) {</span>
                     // do nothing
-<span class="nc" id="L97">                }</span>
+<span class="nc" id="L96">                }</span>
             }
-<span class="nc bnc" id="L99" title="All 2 branches missed.">            if (i == retries - 1) {</span>
-<span class="nc" id="L100">                result = new FrenglyTranslation(source, target, text, &quot;Could not obtain translation!&quot;); // FIXME i18n response</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">            if (i == retries - 1) {</span>
+<span class="nc" id="L99">                result = new FrenglyTranslation(source, target, text, &quot;Could not obtain translation!&quot;); // FIXME i18n response</span>
             }
         }
-<span class="nc" id="L103">        return result;</span>
+<span class="nc" id="L102">        return result;</span>
     }
 
     @Override
     @Cacheable(cacheNames = &quot;translations&quot;)
     public Translation obtainTranslation(String src, String target, String text) {
-<span class="fc" id="L109">        counterService.increment(&quot;services.frengly.translation.invoked&quot;);</span>
-<span class="fc" id="L110">        String source = src;</span>
-<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if (source == null) {</span>
-<span class="nc" id="L112">            source = settings.getDefaultSource();</span>
+<span class="fc" id="L108">        counterService.increment(&quot;services.frengly.translation.invoked&quot;);</span>
+<span class="fc" id="L109">        String source = src;</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if (source == null) {</span>
+<span class="nc" id="L111">            source = settings.getDefaultSource();</span>
         }
-<span class="nc" id="L114">        validateTranslationArguments(source, target, text);</span>
-<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (src.equals(target)) {</span>
-<span class="nc" id="L116">            return new Translation(src, target, text, text);</span>
+<span class="nc" id="L113">        validateTranslationArguments(source, target, text);</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        if (src.equals(target)) {</span>
+<span class="nc" id="L115">            return new Translation(src, target, text, text);</span>
         }
-<span class="nc" id="L118">        FrenglyTranslation ft = tryRequest(source, target, text, settings.getRetries());</span>
-<span class="nc" id="L119">        return new Translation(ft.getSrc(), ft.getDest(), ft.getText(), ft.getTranslation());</span>
+<span class="nc" id="L117">        FrenglyTranslation ft = tryRequest(source, target, text, settings.getRetries());</span>
+<span class="nc" id="L118">        return new Translation(ft.getSrc(), ft.getDest(), ft.getText(), ft.getTranslation());</span>
     }
-
-    @Override
-    @CacheEvict(&quot;translations&quot;)
-    public void evictTranslation(String source, String target, String text) {
-<span class="nc" id="L125">        counterService.increment(&quot;services.frengly.cacheKey.eviction&quot;);</span>
-<span class="nc" id="L126">        log.info(&quot;Key w/ source [{}], target [{}], and text [{}] removed from cache!&quot;);</span>
-<span class="nc" id="L127">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>
