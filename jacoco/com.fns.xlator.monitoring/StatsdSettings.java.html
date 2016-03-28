@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>StatsdSettings.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xlator</a> &gt; <a href="index.source.html" class="el_package">com.fns.xlator.monitoring</a> &gt; <span class="el_source">StatsdSettings.java</span></div><h1>StatsdSettings.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015 - Chris Phillipson
+ * 
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ *
+ * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.fns.xlator.monitoring;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ConfigurationProperties(prefix = &quot;monitoring.statsd&quot;)
+<span class="fc" id="L27">public class StatsdSettings {</span>
+
+    @Value(&quot;${spring.application.name}&quot;)
+    private String applicationName;
+
+    private String hostname;
+
+<span class="fc" id="L34">    private Integer port = 8125;</span>
+
+    private boolean enabled;
+
+<span class="fc" id="L38">    private Integer publishingIntervalInMillis = 30000;</span>
+
+    public String getApplicationName() {
+<span class="nc" id="L41">        return applicationName;</span>
+    }
+
+    public String getApplicationHostname() {
+<span class="nc" id="L45">        String hostname = &quot;localhost&quot;;</span>
+        try {
+<span class="nc" id="L47">            hostname = InetAddress.getLocalHost().getHostName().replace('.', '_');</span>
+<span class="nc" id="L48">        } catch (UnknownHostException uhe) {</span>
+            // do nothing
+<span class="nc" id="L50">        }</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        final String shortName = applicationName.length() &gt; 6 ? applicationName.substring(0, 6) : applicationName;</span>
+<span class="nc" id="L52">        return String.format(&quot;%s-%s&quot;, shortName, hostname);</span>
+    }
+
+    public String getHostname() {
+<span class="nc" id="L56">        return hostname;</span>
+    }
+
+    public void setHostname(String hostname) {
+<span class="nc" id="L60">        this.hostname = hostname;</span>
+<span class="nc" id="L61">    }</span>
+
+    public Integer getPort() {
+<span class="nc" id="L64">        return port;</span>
+    }
+
+    public void setPort(Integer port) {
+<span class="nc" id="L68">        this.port = port;</span>
+<span class="nc" id="L69">    }</span>
+
+    public Integer getPublishingIntervalInMillis() {
+<span class="nc" id="L72">        return publishingIntervalInMillis;</span>
+    }
+
+    public void setPublishingIntervalInMillis(Integer publishingIntervalInMillis) {
+<span class="nc" id="L76">        this.publishingIntervalInMillis = publishingIntervalInMillis;</span>
+<span class="nc" id="L77">    }</span>
+
+    public boolean isEnabled() {
+<span class="nc" id="L80">        return enabled;</span>
+    }
+
+    public void setEnabled(boolean enabled) {
+<span class="nc" id="L84">        this.enabled = enabled;</span>
+<span class="nc" id="L85">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

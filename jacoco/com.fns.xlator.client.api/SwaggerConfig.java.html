@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SwaggerConfig.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xlator</a> &gt; <a href="index.source.html" class="el_package">com.fns.xlator.client.api</a> &gt; <span class="el_source">SwaggerConfig.java</span></div><h1>SwaggerConfig.java</h1><pre class="source lang-java linenums">package com.fns.xlator.client.api;
+
+import static springfox.documentation.builders.PathSelectors.regex;
+import static springfox.documentation.schema.AlternateTypeRules.newRule;
+
+import com.fasterxml.classmate.TypeResolver;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.async.DeferredResult;
+
+import java.time.LocalDate;
+
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.schema.WildcardType;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@Configuration
+@EnableSwagger2
+<span class="fc" id="L27">public class SwaggerConfig {</span>
+
+    @Value(&quot;${app.info.version}&quot;)
+    private String version;
+    
+    @Autowired
+    private TypeResolver typeResolver;
+
+    @Bean
+    public Docket restApi() {
+<span class="fc" id="L37">        return new Docket(DocumentationType.SWAGGER_2)</span>
+<span class="fc" id="L38">                .apiInfo(apiInfo())</span>
+<span class="fc" id="L39">                .directModelSubstitute(LocalDate.class, String.class)</span>
+<span class="fc" id="L40">                .genericModelSubstitutes(ResponseEntity.class)</span>
+<span class="fc" id="L41">                .alternateTypeRules(</span>
+<span class="fc" id="L42">                        newRule(</span>
+<span class="fc" id="L43">                                typeResolver.resolve(DeferredResult.class,</span>
+<span class="fc" id="L44">                                typeResolver.resolve(ResponseEntity.class, WildcardType.class)),</span>
+<span class="fc" id="L45">                                typeResolver.resolve(WildcardType.class))</span>
+                        )
+<span class="fc" id="L47">                .select()</span>
+<span class="fc" id="L48">                .paths(regex(&quot;^(/translation|/v2/api-docs).*$&quot;))</span>
+<span class="fc" id="L49">                .build();</span>
+    }
+
+    private ApiInfo apiInfo() {
+<span class="fc" id="L53">        return new ApiInfoBuilder()</span>
+<span class="fc" id="L54">                .title(&quot;Xlator APIs&quot;)</span>
+<span class="fc" id="L55">                .description(</span>
+                        &quot;This is a comprehensive list of the APIs for Xlator.\nAdditional help is provided in this project's http://fastnsilver.github.io/xlator/[Maven Site].&quot;)
+<span class="fc" id="L57">                .contact(new Contact(&quot;Chris Phillipson&quot;, &quot;http://fastnsilver.github.io/xlator/&quot;, &quot;fastnsilver@gmail.com&quot;))</span>
+<span class="fc" id="L58">                .version(version)</span>
+<span class="fc" id="L59">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

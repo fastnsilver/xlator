@@ -8,7 +8,7 @@
 
 	<head>
 		<meta charset="UTF-8" />
-		<title>xlator &#x2013; About</title>
+		<title>xlator &#x2013; Surefire Report</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content="" />
 		<meta http-equiv="content-language" content="en" />
@@ -34,7 +34,7 @@
 
 	</head>
 
-	<body class="page-index project-xlator" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
+	<body class="page-surefire-report project-xlator" data-spy="scroll" data-offset="60" data-target="#toc-scroll-target">
 
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
@@ -47,10 +47,10 @@
 					<a class="brand" href="https://github.com/fastnsilver/xlator">Xlator (Service)</a>
 					<div class="nav-collapse collapse" id="top-nav-collapse">
 						<ul class="nav pull-right">
-							<li class="dropdown active">
+							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Overview <b class="caret"></b></a>
 								<ul class="dropdown-menu">
-									<li class="active"><a href="" title="About">About</a></li>
+									<li ><a href="index.html" title="About">About</a></li>
 									<li ><a href="license.html" title="Project License">Project License</a></li>
 								</ul>
 							</li>
@@ -75,11 +75,11 @@
 									<li ><a href="plugins.html" title="Project Plugins">Project Plugins</a></li>
 								</ul>
 							</li>
-							<li class="dropdown">
+							<li class="dropdown active">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Stats <b class="caret"></b></a>
 								<ul class="dropdown-menu">
 									<li ><a href="changelog.html" title="Change Log">Change Log</a></li>
-									<li ><a href="surefire-report.html" title="Surefire Report">Surefire Report</a></li>
+									<li class="active"><a href="" title="Surefire Report">Surefire Report</a></li>
 									<li ><a href="failsafe-report.html" title="Failsafe Report">Failsafe Report</a></li>
 									<li ><a href="jacoco/index.html" title="JaCoCo Test Coverage">JaCoCo Test Coverage</a></li>
 								</ul>
@@ -117,12 +117,220 @@
 	<div class="row">
 		<div class="span12">
 			<div class="body-content">
+<script type="text/javascript">
+//<![CDATA[
+function toggleDisplay(elementId) {
+ var elm = document.getElementById(elementId + 'error');
+ if (elm && typeof elm.style != "undefined") {
+ if (elm.style.display == "none") {
+ elm.style.display = "";
+ document.getElementById(elementId + 'off').style.display = "none";
+ document.getElementById(elementId + 'on').style.display = "inline";
+ } else if (elm.style.display == "") { elm.style.display = "none";
+ document.getElementById(elementId + 'off').style.display = "inline";
+ document.getElementById(elementId + 'on').style.display = "none";
+ } 
+ } 
+ }
+//]]>
+</script> 
 <div class="section"> 
  <div class="page-header">
-  <h2 id="About_xlator">About xlator</h2>
+  <h2 id="Surefire_Report">Surefire Report</h2>
  </div> 
- <a name="About_xlator"></a> 
- <p>Translation service prototype that is backed by a hosted Elasticache (Redis) instance</p> 
+</div> 
+<div class="section"> 
+ <h2 id="Summary">Summary</h2> 
+ <a name="Summary"></a> 
+ <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p> 
+ <br /> 
+ <table border="1" class="bodyTable table table-striped table-hover"> 
+  <thead> 
+   <tr class="a"> 
+    <th>Tests</th> 
+    <th>Errors </th> 
+    <th>Failures</th> 
+    <th>Skipped</th> 
+    <th>Success Rate</th> 
+    <th>Time</th> 
+   </tr> 
+  </thead> 
+  <tbody> 
+   <tr class="b"> 
+    <td>4</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>100%</td> 
+    <td>0.486</td> 
+   </tr> 
+  </tbody> 
+ </table> 
+ <br /> 
+ <p>Note: failures are anticipated and checked for with assertions while errors are unanticipated.</p> 
+ <br /> 
+</div> 
+<div class="section"> 
+ <h2 id="Package_List">Package List</h2> 
+ <a name="Package_List"></a> 
+ <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p> 
+ <br /> 
+ <table border="1" class="bodyTable table table-striped table-hover"> 
+  <thead> 
+   <tr class="a"> 
+    <th>Package</th> 
+    <th>Tests</th> 
+    <th>Errors </th> 
+    <th>Failures</th> 
+    <th>Skipped</th> 
+    <th>Success Rate</th> 
+    <th>Time</th> 
+   </tr> 
+  </thead> 
+  <tbody> 
+   <tr class="b"> 
+    <td><a href="#com.fns.xlator.api">com.fns.xlator.api</a></td> 
+    <td>3</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>100%</td> 
+    <td>0.486</td> 
+   </tr> 
+   <tr class="a"> 
+    <td><a href="#com.fns.xlator">com.fns.xlator</a></td> 
+    <td>1</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>0</td> 
+    <td>100%</td> 
+    <td>0</td> 
+   </tr> 
+  </tbody> 
+ </table> 
+ <br /> 
+ <p>Note: package statistics are not computed recursively, they only sum up all of its testsuites numbers.</p> 
+ <div class="section"> 
+  <h3 id="com.fns.xlator.api">com.fns.xlator.api</h3> 
+  <a name="com.fns.xlator.api"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <thead> 
+    <tr class="a"> 
+     <th></th> 
+     <th>Class</th> 
+     <th>Tests</th> 
+     <th>Errors </th> 
+     <th>Failures</th> 
+     <th>Skipped</th> 
+     <th>Success Rate</th> 
+     <th>Time</th> 
+    </tr> 
+   </thead> 
+   <tbody> 
+    <tr class="b"> 
+     <td><a href="#com.fns.xlator.apiSwagger2MarkupTest"><i class="icon-ok"></i></a></td> 
+     <td><a href="#com.fns.xlator.apiSwagger2MarkupTest">Swagger2MarkupTest</a></td> 
+     <td>2</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>100%</td> 
+     <td>0.461</td> 
+    </tr> 
+    <tr class="a"> 
+     <td><a href="#com.fns.xlator.apiTranslationServiceTest"><i class="icon-ok"></i></a></td> 
+     <td><a href="#com.fns.xlator.apiTranslationServiceTest">TranslationServiceTest</a></td> 
+     <td>1</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>100%</td> 
+     <td>0.025</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="com.fns.xlator">com.fns.xlator</h3> 
+  <a name="com.fns.xlator"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <thead> 
+    <tr class="a"> 
+     <th></th> 
+     <th>Class</th> 
+     <th>Tests</th> 
+     <th>Errors </th> 
+     <th>Failures</th> 
+     <th>Skipped</th> 
+     <th>Success Rate</th> 
+     <th>Time</th> 
+    </tr> 
+   </thead> 
+   <tbody> 
+    <tr class="b"> 
+     <td><a href="#com.fns.xlatorAppTests"><i class="icon-ok"></i></a></td> 
+     <td><a href="#com.fns.xlatorAppTests">AppTests</a></td> 
+     <td>1</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>0</td> 
+     <td>100%</td> 
+     <td>0</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <br /> 
+</div> 
+<div class="section"> 
+ <h2 id="Test_Cases">Test Cases</h2> 
+ <a name="Test_Cases"></a> 
+ <p>[<a href="#Summary">Summary</a>] [<a href="#Package_List">Package List</a>] [<a href="#Test_Cases">Test Cases</a>]</p> 
+ <div class="section"> 
+  <h3 id="Swagger2MarkupTest">Swagger2MarkupTest</h3> 
+  <a name="com.fns.xlator.apiSwagger2MarkupTest"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <tbody> 
+    <tr class="a"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_com.fns.xlator.api.Swagger2MarkupTest.convertSwaggerToAsciiDoc"></a>convertSwaggerToAsciiDoc</td> 
+     <td>0.427</td> 
+    </tr> 
+    <tr class="b"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_com.fns.xlator.api.Swagger2MarkupTest.convertSwaggerToMarkdown"></a>convertSwaggerToMarkdown</td> 
+     <td>0.034</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="TranslationServiceTest">TranslationServiceTest</h3> 
+  <a name="com.fns.xlator.apiTranslationServiceTest"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <tbody> 
+    <tr class="a"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_com.fns.xlator.api.TranslationServiceTest.testObtainTranslation_badLocales"></a>testObtainTranslation_badLocales</td> 
+     <td>0.025</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <div class="section"> 
+  <h3 id="AppTests">AppTests</h3> 
+  <a name="com.fns.xlatorAppTests"></a> 
+  <table border="1" class="bodyTable table table-striped table-hover"> 
+   <tbody> 
+    <tr class="a"> 
+     <td><i class="icon-ok"></i></td> 
+     <td><a name="TC_com.fns.xlator.AppTests.contextLoads"></a>contextLoads</td> 
+     <td>0</td> 
+    </tr> 
+   </tbody> 
+  </table> 
+ </div> 
+ <br /> 
 </div>
 			</div>
 		</div>
@@ -139,8 +347,8 @@
 				<div class="span3 bottom-nav">
 					<ul class="nav nav-list">
 						<li class="nav-header">Overview</li>
-						<li class="active">
-							<a href="#" title="About">About</a>
+						<li >
+							<a href="index.html" title="About">About</a>
 						</li>
 						<li >
 							<a href="license.html" title="Project License">Project License</a>
@@ -192,8 +400,8 @@
 						<li >
 							<a href="changelog.html" title="Change Log">Change Log</a>
 						</li>
-						<li >
-							<a href="surefire-report.html" title="Surefire Report">Surefire Report</a>
+						<li class="active">
+							<a href="#" title="Surefire Report">Surefire Report</a>
 						</li>
 						<li >
 							<a href="failsafe-report.html" title="Failsafe Report">Failsafe Report</a>
