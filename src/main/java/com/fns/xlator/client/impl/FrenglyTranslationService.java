@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -117,13 +116,6 @@ public class FrenglyTranslationService implements TranslationService {
         }
         FrenglyTranslation ft = tryRequest(source, target, text, settings.getRetries());
         return new Translation(ft.getSrc(), ft.getDest(), ft.getText(), ft.getTranslation());
-    }
-
-    @Override
-    @CacheEvict("translations")
-    public void evictTranslation(String source, String target, String text) {
-        counterService.increment("services.frengly.cacheKey.eviction");
-        log.info("Key w/ source [{}], target [{}], and text [{}] removed from cache!");
     }
 
 }

@@ -6,6 +6,4 @@ public interface TranslationService {
 
     public Translation obtainTranslation(String source, String target, String text);
 
-    public void evictTranslation(String source, String target, String text);
-
 }
