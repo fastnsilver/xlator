@@ -346,6 +346,30 @@
         
         <plugins>
             <plugin>
+                 <groupId>org.asciidoctor</groupId>
+                 <artifactId>asciidoctor-maven-plugin</artifactId>
+                 <version>${asciidoctor-maven-plugin.version}</version>
+                 <executions>
+                     <execution>
+                         <id>generate-docs</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>process-asciidoc</goal>
+                         </goals>
+                         <configuration>
+                             <backend>html</backend>
+                             <attributes>
+                                 <toclevels>2</toclevels>
+                                 <toc>left</toc>
+                                 <doctype>book</doctype>
+                                 <generated>${project.build.directory}/docs/asciidoc/generated</generated>
+                             </attributes>
+                             <outputDirectory>${project.build.directory}/site</outputDirectory>
+                         </configuration>
+                     </execution>
+                 </executions>
+            </plugin>
+            <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
             </plugin>
@@ -428,7 +452,7 @@
                     <dependency>
                         <groupId>org.springframework.cloud</groupId>
                         <artifactId>spring-cloud-dependencies</artifactId>
-                        <version>Brixton.M5</version>
+                        <version>Brixton.RC1</version>
                         <type>pom</type>
                         <scope>import</scope>
                     </dependency>
