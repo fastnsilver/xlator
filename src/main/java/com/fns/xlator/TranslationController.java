@@ -2,6 +2,7 @@ package com.fns.xlator;
 
 import com.fns.xlator.client.api.CacheService;
 import com.fns.xlator.client.api.TranslationService;
+import com.fns.xlator.client.impl.TranslationException;
 import com.fns.xlator.model.ErrorResponse;
 import com.fns.xlator.model.Translation;
 import com.fns.xlator.model.TranslationRequest;
@@ -46,7 +47,7 @@ public class TranslationController {
     @Autowired
     public TranslationController(CacheService cacheService, TranslationService translationService,
             @Value("${app.defaults.locale}") String defaultLocale,
-            @Value("${app.limits.translationsPerRequest}") int maximumTranslations) {
+            @Value("${app.limits.translationsPerRequest:25}") int maximumTranslations) {
         this.cacheService = cacheService;
         this.translationService = translationService;
         this.defaultLocale = defaultLocale;
@@ -63,9 +64,9 @@ public class TranslationController {
         for (TranslationRequest tr : translationRequests) {
             try {
                 translations.add(translationService.obtainTranslation(tr.getSource(), tr.getTarget(), tr.getText()));
-            } catch (IllegalArgumentException iae) {
+            } catch (IllegalArgumentException | TranslationException e) {
                 errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),
-                        iae.getMessage()));
+                        e.getMessage()));
             }
         }
         Translations result = new Translations(translations, errors);
@@ -82,9 +83,9 @@ public class TranslationController {
         for (String target : t) {
             try {
                 translations.add(translationService.obtainTranslation(source, target, text));
-            } catch (IllegalArgumentException iae) {
+            } catch (IllegalArgumentException | TranslationException e) {
                 errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),
-                        iae.getMessage()));
+                        e.getMessage()));
             }
         }
         Translations result = new Translations(translations, errors);
@@ -170,7 +171,7 @@ public class TranslationController {
     }
 
     
-    @ExceptionHandler({ IllegalArgumentException.class })
+    @ExceptionHandler({ IllegalArgumentException.class, TranslationException.class })
     protected ResponseEntity<ErrorResponse> badRequest(Exception e, HttpServletRequest hsr) {
         ErrorResponse er = new ErrorResponse(hsr.getMethod(), hsr.getRequestURI(), hsr.getQueryString(),
                 e.getMessage());

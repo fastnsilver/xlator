@@ -8,11 +8,18 @@
 
 Translation service prototype that is backed by either an in-memory or a hosted Elasticache (Redis) instance
 
-Current service implementation makes requests of [frengly](http://frengly.com).
+Current service implementation makes requests of [frengly](http://frengly.com) or Google [Translate API](https://cloud.google.com/translate/v2/using_rest#Translate).
 
+## to use Frengly 
 You will need to register for an account and add `app.frengly.email` and `app.frengly.password` to [application.yml](https://raw.githubusercontent.com/fastnsilver/xlator/master/src/main/resources/application.yml).
 
 Note that frengly.com throttles requests, so intermittent HTTP 5xx responses are to be expected.
+
+## to use Google Translate
+You will need to sign-up for a Google [Cloud Platform](https://cloud.google.com/) account, then follow instructions to setup a project, billing, and enable Translate API calls.
+Then you'll need to configure [application.yml](https://raw.githubusercontent.com/fastnsilver/xlator/master/src/main/resources/application.yml) by adding a `app.google.key` and changing `app.defaults.service` to be `google`.
+
+Please review the [disclaimer](https://cloud.google.com/translate/v2/attribution#disclaimer) if you configure `xlator` to use Google Translate API.
 
 ## Service Endpoints
 
@@ -221,9 +228,7 @@ mvn scm-publish:publish-scm -Pdocumentation
 
 2) Publish docker image to Dockerhub
 
-3) Publish Maven Site
-
-4) Deploy service to AWS
+3) Deploy service to AWS
 
 
 Still left to explore...
@@ -233,6 +238,4 @@ a) The ability to warm the cache from an external file (e.g., via `redis-cli` to
 b) Completing integration w/ [Elasticache](https://aws.amazon.com/elasticache/)  (@see `aws` Maven profile in [pom.xml](https://github.com/fastnsilver/xlator/blob/master/pom.xml))
 
 c) Listening to an event from Redis, Kafka or Kinesis instead of exposing an invalidate HTTP end-point
-
-d) Authoring an alternate service implementation backed by Google Translate [API](https://cloud.google.com/translate/v2/using_rest)
 

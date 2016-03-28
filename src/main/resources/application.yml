@@ -1,14 +1,17 @@
 # MASTER CONFIGURATION
 # Be sure to register for an account on http://frengly.com before attempting to use this service!
-# You should update the configuration below, uncommenting email and password and entering appropriate values matching a valid pair of credentials. 
+# You should update the configuration below, uncommenting email and password and entering appropriate values matching a valid pair of credentials.
+# Another pay-for option is the Google Translate API (@see https://cloud.google.com/translate/v2/using_rest).
+# Update the configuration below to add your API key.  Be sure to update the app.defaults.service key to google if you wish to employ the Google Translate API instead.
 
 app:
-  frengly:
+  #frengly:
     #email: 
     #password: 
+  #google:
+    #key:
   defaults:
-    locale: en
+    # service options are: frengly (the default) or google (if updated)
+    service: frengly
   info:
     version: @project.version@
-  limits:
-    translationsPerRequest: 50
