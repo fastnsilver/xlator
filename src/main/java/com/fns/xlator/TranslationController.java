@@ -1,5 +1,6 @@
 package com.fns.xlator;
 
+import com.fns.xlator.client.api.CacheService;
 import com.fns.xlator.client.api.TranslationService;
 import com.fns.xlator.model.ErrorResponse;
 import com.fns.xlator.model.Translation;
@@ -25,58 +26,34 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/translation")
+@Api(value = "translation", produces = "application/json")
 public class TranslationController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
+
+    private CacheService cacheService;
     private TranslationService translationService;
     private String defaultLocale;
     private int maximumTranslations;
 
     @Autowired
-    public TranslationController(TranslationService translationService,
+    public TranslationController(CacheService cacheService, TranslationService translationService,
             @Value("${app.defaults.locale}") String defaultLocale,
             @Value("${app.limits.translationsPerRequest}") int maximumTranslations) {
+        this.cacheService = cacheService;
         this.translationService = translationService;
         this.defaultLocale = defaultLocale;
+        this.maximumTranslations = maximumTranslations;
     }
 
-
-    @RequestMapping(value = "/source/{src}/target/{target}/text/{text}", method = RequestMethod.GET)
-    public ResponseEntity<Translation> obtainTranslation(@PathVariable("src") String source,
-            @PathVariable("target") String target, @PathVariable("text") String text) {
-        return ResponseEntity.ok(translationService.obtainTranslation(source, target, text));
-    }
-
-    // convenience, uses a configurable default locale
-    @RequestMapping(value = "/target/{target}/text/{text}", method = RequestMethod.GET)
-    public ResponseEntity<Translation> obtainTranslation(@PathVariable("target") String target,
-            @PathVariable("text") String text) {
-        return ResponseEntity.ok(translationService.obtainTranslation(defaultLocale, target, text));
-    }
-
-    // convenience, source x n target combinations for a text
-    @RequestMapping(value = "/source/{src}/targets/{targets}/text/{text}", method = RequestMethod.GET)
-    public ResponseEntity<Translations> obtainTranslations(@PathVariable("src") String source,
-            @PathVariable("targets") String targets, @PathVariable("text") String text, HttpServletRequest request) {
-        return fetchTranslations(source, targets, text, request);
-    }
-
-    // convenience, default configurable locale x n target combinations for a text
-    @RequestMapping(value = "/targets/{targets}/text/{text}", method = RequestMethod.GET)
-    public ResponseEntity<Translations> obtainTranslations(@PathVariable("targets") String targets,
-            @PathVariable("text") String text, HttpServletRequest request) {
-        return fetchTranslations(defaultLocale, targets, text, request);
-    }
-
-    // most flexible option
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ResponseEntity<Translations> obtainTranslations(@RequestBody TranslationRequest[] translationRequests,
-            HttpServletRequest request) {
-        return fetchTranslations(translationRequests, request);
-    }
-
+    
     protected ResponseEntity<Translations> fetchTranslations(TranslationRequest[] translationRequests,
             HttpServletRequest request) {
         List<Translation> translations = new ArrayList<>();
@@ -114,14 +91,85 @@ public class TranslationController {
         return ResponseEntity.ok(result);
     }
 
+
+    @RequestMapping(value = "/source/{src}/target/{target}/text/{text}", method = RequestMethod.GET)
+    @ApiOperation(httpMethod = "GET", notes = "Obtain a translation.", value = "/translation/source/{src}/target/{target}/text/{text}")
+    @ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Successfully obtained translation."),
+            @ApiResponse(code = 400, message = "Bad request."),
+            @ApiResponse(code = 500, message = "Internal server error.") 
+    })
+    public ResponseEntity<Translation> obtainTranslation(@PathVariable("src") String source,
+            @PathVariable("target") String target, @PathVariable("text") String text) {
+        return ResponseEntity.ok(translationService.obtainTranslation(source, target, text));
+    }
+
+    // convenience, uses a configurable default locale
+    @RequestMapping(value = "/target/{target}/text/{text}", method = RequestMethod.GET)
+    @ApiOperation(httpMethod = "GET", notes = "Obtain a translation using default locale.", value = "/translation/target/{target}/text/{text}")
+    @ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Successfully obtained translation."),
+            @ApiResponse(code = 400, message = "Bad request."),
+            @ApiResponse(code = 500, message = "Internal server error.") 
+    })
+    public ResponseEntity<Translation> obtainTranslation(@PathVariable("target") String target,
+            @PathVariable("text") String text) {
+        return ResponseEntity.ok(translationService.obtainTranslation(defaultLocale, target, text));
+    }
+
+    // convenience, source x n target combinations for a text
+    @RequestMapping(value = "/source/{src}/targets/{targets}/text/{text}", method = RequestMethod.GET)
+    @ApiOperation(httpMethod = "GET", notes = "Obtain translations for each target locale.", value = "/translation/source/{src}/targets/{targets}/text/{text}")
+    @ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Obtained translations.  (Report errors with any target)."),
+            @ApiResponse(code = 400, message = "Bad request."),
+            @ApiResponse(code = 500, message = "Internal server error.") 
+    })
+    public ResponseEntity<Translations> obtainTranslations(@PathVariable("src") String source,
+            @PathVariable("targets") String targets, @PathVariable("text") String text, HttpServletRequest request) {
+        return fetchTranslations(source, targets, text, request);
+    }
+
+    // convenience, default configurable locale x n target combinations for a text
+    @RequestMapping(value = "/targets/{targets}/text/{text}", method = RequestMethod.GET)
+    @ApiOperation(httpMethod = "GET", notes = "Obtain translations for each target locale using default locale.", value = "/translation/targets/{targets}/text/{text}")
+    @ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Obtained translations.  (Report errors with any target)."),
+            @ApiResponse(code = 400, message = "Bad request."),
+            @ApiResponse(code = 500, message = "Internal server error.") 
+    })
+    public ResponseEntity<Translations> obtainTranslations(@PathVariable("targets") String targets,
+            @PathVariable("text") String text, HttpServletRequest request) {
+        return fetchTranslations(defaultLocale, targets, text, request);
+    }
+
+    // most flexible option
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @ApiOperation(httpMethod = "POST", notes = "Obtain translations.", value = "/translation/")
+    @ApiResponses(value = { 
+            @ApiResponse(code = 200, message = "Obtained translations.  (Report errors with any source-target-text combination)."),
+            @ApiResponse(code = 400, message = "Bad request."),
+            @ApiResponse(code = 500, message = "Internal server error.") 
+    })
+    public ResponseEntity<Translations> obtainTranslations(@RequestBody TranslationRequest[] translationRequests,
+            HttpServletRequest request) {
+        return fetchTranslations(translationRequests, request);
+    }
+
     @RequestMapping(value = "/source/{src}/target/{target}/text/{text}", method = RequestMethod.DELETE)
+    @ApiOperation(httpMethod = "DELETE", notes = "Evict cache-key for a previously obtained translation.", value = "/translation/source/{src}/target/{target}/text/{text}")
+    @ApiResponses(value = { 
+            @ApiResponse(code = 204, message = "Successfully evicted key."),
+            @ApiResponse(code = 500, message = "Internal server error.") 
+    })
     public ResponseEntity<?> invalidateCacheKey(@PathVariable("src") String source,
             @PathVariable("target") String target, @PathVariable("text") String text) {
-        translationService.evictTranslation(source, target, text);
+        cacheService.evictTranslation(source, target, text);
         log.info(String.format("Evicted cache key for /source/%s/target/%s/text/%s", source, target, text));
         return ResponseEntity.noContent().build();
     }
 
+    
     @ExceptionHandler({ IllegalArgumentException.class })
     protected ResponseEntity<ErrorResponse> badRequest(Exception e, HttpServletRequest hsr) {
         ErrorResponse er = new ErrorResponse(hsr.getMethod(), hsr.getRequestURI(), hsr.getQueryString(),
