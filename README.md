@@ -225,9 +225,7 @@ mvn scm-publish:publish-scm -Pdocumentation
 
 1) Improve test coverage
 
-2) Publish docker image to Dockerhub
-
-3) Deploy service to AWS
+2) Deploy service to AWS
 
 
 Still left to explore...
