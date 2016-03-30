@@ -2,5 +2,7 @@ com.fns.xlator
 com.fns.xlator.client.api
 com.fns.xlator.client.config
 com.fns.xlator.client.impl
+com.fns.xlator.client.impl.frengly
+com.fns.xlator.client.impl.google
 com.fns.xlator.model
 com.fns.xlator.monitoring

@@ -2,6 +2,7 @@
 
 import com.fns.xlator.client.api.CacheService;
 import com.fns.xlator.client.api.TranslationService;
+import com.fns.xlator.client.impl.TranslationException;
 import com.fns.xlator.model.ErrorResponse;
 import com.fns.xlator.model.Translation;
 import com.fns.xlator.model.TranslationRequest;
@@ -36,7 +37,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = &quot;translation&quot;, produces = &quot;application/json&quot;)
 public class TranslationController {
 
-<span class="fc" id="L39">    private final Logger log = LoggerFactory.getLogger(getClass());</span>
+<span class="fc" id="L40">    private final Logger log = LoggerFactory.getLogger(getClass());</span>
 
     private CacheService cacheService;
     private TranslationService translationService;
@@ -46,47 +47,49 @@ public class TranslationController {
     @Autowired
     public TranslationController(CacheService cacheService, TranslationService translationService,
             @Value(&quot;${app.defaults.locale}&quot;) String defaultLocale,
-<span class="fc" id="L49">            @Value(&quot;${app.limits.translationsPerRequest}&quot;) int maximumTranslations) {</span>
-<span class="fc" id="L50">        this.translationService = translationService;</span>
-<span class="fc" id="L51">        this.defaultLocale = defaultLocale;</span>
-<span class="fc" id="L52">    }</span>
+<span class="fc" id="L50">            @Value(&quot;${app.limits.translationsPerRequest}&quot;) int maximumTranslations) {</span>
+<span class="fc" id="L51">        this.cacheService = cacheService;</span>
+<span class="fc" id="L52">        this.translationService = translationService;</span>
+<span class="fc" id="L53">        this.defaultLocale = defaultLocale;</span>
+<span class="fc" id="L54">        this.maximumTranslations = maximumTranslations;</span>
+<span class="fc" id="L55">    }</span>
 
     
     protected ResponseEntity&lt;Translations&gt; fetchTranslations(TranslationRequest[] translationRequests,
             HttpServletRequest request) {
-<span class="nc" id="L57">        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L58">        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L59" title="All 2 branches missed.">        Assert.isTrue(translationRequests.length &lt;= maximumTranslations, String.format(</span>
-<span class="nc" id="L60">                &quot;[Assertion failed] - No more than %d translations may be requested at once!&quot;, maximumTranslations));</span>
-<span class="nc bnc" id="L61" title="All 2 branches missed.">        for (TranslationRequest tr : translationRequests) {</span>
+<span class="nc" id="L60">        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L61">        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        Assert.isTrue(translationRequests.length &lt;= maximumTranslations, String.format(</span>
+<span class="nc" id="L63">                &quot;[Assertion failed] - No more than %d translations may be requested at once!&quot;, maximumTranslations));</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        for (TranslationRequest tr : translationRequests) {</span>
             try {
-<span class="nc" id="L63">                translations.add(translationService.obtainTranslation(tr.getSource(), tr.getTarget(), tr.getText()));</span>
-<span class="nc" id="L64">            } catch (IllegalArgumentException iae) {</span>
-<span class="nc" id="L65">                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),</span>
-<span class="nc" id="L66">                        iae.getMessage()));</span>
-<span class="nc" id="L67">            }</span>
+<span class="nc" id="L66">                translations.add(translationService.obtainTranslation(tr.getSource(), tr.getTarget(), tr.getText()));</span>
+<span class="nc" id="L67">            } catch (IllegalArgumentException | TranslationException e) {</span>
+<span class="nc" id="L68">                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),</span>
+<span class="nc" id="L69">                        e.getMessage()));</span>
+<span class="nc" id="L70">            }</span>
         }
-<span class="nc" id="L69">        Translations result = new Translations(translations, errors);</span>
-<span class="nc" id="L70">        return ResponseEntity.ok(result);</span>
+<span class="nc" id="L72">        Translations result = new Translations(translations, errors);</span>
+<span class="nc" id="L73">        return ResponseEntity.ok(result);</span>
     }
 
     protected ResponseEntity&lt;Translations&gt; fetchTranslations(String source, String targets, String text,
             HttpServletRequest request) {
-<span class="nc" id="L75">        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L76">        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L77">        List&lt;String&gt; t = Arrays.asList(targets.split(&quot;\\s*,\\s*&quot;));</span>
-<span class="nc bnc" id="L78" title="All 2 branches missed.">        Assert.isTrue(t.size() &lt;= maximumTranslations, String.format(</span>
-<span class="nc" id="L79">                &quot;[Assertion failed] - No more than %d translations may be requested at once!&quot;, maximumTranslations));</span>
-<span class="nc bnc" id="L80" title="All 2 branches missed.">        for (String target : t) {</span>
+<span class="nc" id="L78">        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L79">        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L80">        List&lt;String&gt; t = Arrays.asList(targets.split(&quot;\\s*,\\s*&quot;));</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        Assert.isTrue(t.size() &lt;= maximumTranslations, String.format(</span>
+<span class="nc" id="L82">                &quot;[Assertion failed] - No more than %d translations may be requested at once!&quot;, maximumTranslations));</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        for (String target : t) {</span>
             try {
-<span class="nc" id="L82">                translations.add(translationService.obtainTranslation(source, target, text));</span>
-<span class="nc" id="L83">            } catch (IllegalArgumentException iae) {</span>
-<span class="nc" id="L84">                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),</span>
-<span class="nc" id="L85">                        iae.getMessage()));</span>
-<span class="nc" id="L86">            }</span>
-<span class="nc" id="L87">        }</span>
-<span class="nc" id="L88">        Translations result = new Translations(translations, errors);</span>
-<span class="nc" id="L89">        return ResponseEntity.ok(result);</span>
+<span class="nc" id="L85">                translations.add(translationService.obtainTranslation(source, target, text));</span>
+<span class="nc" id="L86">            } catch (IllegalArgumentException | TranslationException e) {</span>
+<span class="nc" id="L87">                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),</span>
+<span class="nc" id="L88">                        e.getMessage()));</span>
+<span class="nc" id="L89">            }</span>
+<span class="nc" id="L90">        }</span>
+<span class="nc" id="L91">        Translations result = new Translations(translations, errors);</span>
+<span class="nc" id="L92">        return ResponseEntity.ok(result);</span>
     }
 
 
@@ -99,7 +102,7 @@ public class TranslationController {
     })
     public ResponseEntity&lt;Translation&gt; obtainTranslation(@PathVariable(&quot;src&quot;) String source,
             @PathVariable(&quot;target&quot;) String target, @PathVariable(&quot;text&quot;) String text) {
-<span class="nc" id="L102">        return ResponseEntity.ok(translationService.obtainTranslation(source, target, text));</span>
+<span class="nc" id="L105">        return ResponseEntity.ok(translationService.obtainTranslation(source, target, text));</span>
     }
 
     // convenience, uses a configurable default locale
@@ -112,7 +115,7 @@ public class TranslationController {
     })
     public ResponseEntity&lt;Translation&gt; obtainTranslation(@PathVariable(&quot;target&quot;) String target,
             @PathVariable(&quot;text&quot;) String text) {
-<span class="nc" id="L115">        return ResponseEntity.ok(translationService.obtainTranslation(defaultLocale, target, text));</span>
+<span class="nc" id="L118">        return ResponseEntity.ok(translationService.obtainTranslation(defaultLocale, target, text));</span>
     }
 
     // convenience, source x n target combinations for a text
@@ -125,7 +128,7 @@ public class TranslationController {
     })
     public ResponseEntity&lt;Translations&gt; obtainTranslations(@PathVariable(&quot;src&quot;) String source,
             @PathVariable(&quot;targets&quot;) String targets, @PathVariable(&quot;text&quot;) String text, HttpServletRequest request) {
-<span class="nc" id="L128">        return fetchTranslations(source, targets, text, request);</span>
+<span class="nc" id="L131">        return fetchTranslations(source, targets, text, request);</span>
     }
 
     // convenience, default configurable locale x n target combinations for a text
@@ -138,7 +141,7 @@ public class TranslationController {
     })
     public ResponseEntity&lt;Translations&gt; obtainTranslations(@PathVariable(&quot;targets&quot;) String targets,
             @PathVariable(&quot;text&quot;) String text, HttpServletRequest request) {
-<span class="nc" id="L141">        return fetchTranslations(defaultLocale, targets, text, request);</span>
+<span class="nc" id="L144">        return fetchTranslations(defaultLocale, targets, text, request);</span>
     }
 
     // most flexible option
@@ -151,7 +154,7 @@ public class TranslationController {
     })
     public ResponseEntity&lt;Translations&gt; obtainTranslations(@RequestBody TranslationRequest[] translationRequests,
             HttpServletRequest request) {
-<span class="nc" id="L154">        return fetchTranslations(translationRequests, request);</span>
+<span class="nc" id="L157">        return fetchTranslations(translationRequests, request);</span>
     }
 
     @RequestMapping(value = &quot;/source/{src}/target/{target}/text/{text}&quot;, method = RequestMethod.DELETE)
@@ -162,18 +165,18 @@ public class TranslationController {
     })
     public ResponseEntity&lt;?&gt; invalidateCacheKey(@PathVariable(&quot;src&quot;) String source,
             @PathVariable(&quot;target&quot;) String target, @PathVariable(&quot;text&quot;) String text) {
-<span class="nc" id="L165">        cacheService.evictTranslation(source, target, text);</span>
-<span class="nc" id="L166">        log.info(String.format(&quot;Evicted cache key for /source/%s/target/%s/text/%s&quot;, source, target, text));</span>
-<span class="nc" id="L167">        return ResponseEntity.noContent().build();</span>
+<span class="nc" id="L168">        cacheService.evictTranslation(source, target, text);</span>
+<span class="nc" id="L169">        log.info(String.format(&quot;Evicted cache key for /source/%s/target/%s/text/%s&quot;, source, target, text));</span>
+<span class="nc" id="L170">        return ResponseEntity.noContent().build();</span>
     }
 
     
-    @ExceptionHandler({ IllegalArgumentException.class })
+    @ExceptionHandler({ IllegalArgumentException.class, TranslationException.class })
     protected ResponseEntity&lt;ErrorResponse&gt; badRequest(Exception e, HttpServletRequest hsr) {
-<span class="nc" id="L173">        ErrorResponse er = new ErrorResponse(hsr.getMethod(), hsr.getRequestURI(), hsr.getQueryString(),</span>
-<span class="nc" id="L174">                e.getMessage());</span>
-<span class="nc" id="L175">        log.error(er.asLog());</span>
-<span class="nc" id="L176">        return ResponseEntity.badRequest().body(er);</span>
+<span class="nc" id="L176">        ErrorResponse er = new ErrorResponse(hsr.getMethod(), hsr.getRequestURI(), hsr.getQueryString(),</span>
+<span class="nc" id="L177">                e.getMessage());</span>
+<span class="nc" id="L178">        log.error(er.asLog());</span>
+<span class="nc" id="L179">        return ResponseEntity.badRequest().body(er);</span>
     }
 
 }
