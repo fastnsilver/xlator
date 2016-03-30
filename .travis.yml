@@ -2,7 +2,7 @@ language: bash
 services:
   - docker
 script:
-  - docker build -t fastnsilver/maven:3.3.9-oracle-jdk8 ./docker/maven
+  - docker build -t fastnsilver/maven:3.3.9-oracle-jdk8 ./build/docker/maven
   - docker run -it --rm --name xlator -v "$(pwd)":/root/sources -w /root/sources fastnsilver/maven:3.3.9-oracle-jdk8 mvn clean install
 after_success:
   - bash <(curl -s https://codecov.io/bash)
