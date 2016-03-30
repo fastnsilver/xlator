@@ -235,7 +235,5 @@ Still left to explore...
 
 a) The ability to warm the cache from an external file (e.g., via `redis-cli` to [Elasticache Redis](https://loutilities.wordpress.com/2015/03/23/fastest-way-to-warm-an-aws-redis-elasticache-with-json-data/))
 
-b) Completing integration w/ [Elasticache](https://aws.amazon.com/elasticache/)  (@see `aws` Maven profile in [pom.xml](https://github.com/fastnsilver/xlator/blob/master/pom.xml))
-
-c) Listening to an event from Redis, Kafka or Kinesis instead of exposing an invalidate HTTP end-point
+b) Listening to an event from Redis, Kafka or Kinesis instead of exposing an invalidate HTTP end-point
 

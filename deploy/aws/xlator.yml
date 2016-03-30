@@ -1,0 +1,55 @@
+# DOCKER COMPOSE CONFIGURATION
+
+
+## INFRASTRUCTURE SERVICES
+    
+### GRAPHITE, STATSD
+graphite:
+  image: hopsoft/graphite-statsd
+  ports:
+    - 8000:80
+    - 2003:2003
+    - 8125:8125
+    - 8125:8125/udp
+    - 8126:8126
+
+### GRAFANA
+# Password intentionally not included
+grafana:
+  image: grafana/grafana
+  ports:
+    - 3000:3000
+  environment:
+    - GF_SECURITY_ADMIN_PASSWORD=
+  links:
+    - graphite
+    
+### CADVISOR
+cadvisor:
+  image: google/cadvisor:latest
+  volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+  ports:
+    - 9080:8080
+
+
+## CORE SERVICES
+
+### XLATOR SERVICE
+# Frengly service credentials intentionally not included
+# Redis host intentionally not included
+xlator:
+  image: fastnsilver/xlator
+  ports:
+    - 80:8080
+  links:
+    - graphite
+  environment:
+    - APP_FRENGLY_EMAIL=
+    - APP_FRENGLY_PASSWORD=
+    - MONITORING_STATSD_ENABLED=true
+    - SPRING_REDIS_HOST=
+    - SPRING_PROFILES_ACTIVE=aws

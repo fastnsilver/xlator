@@ -1,0 +1,142 @@
+This is the sequence of commands to be run with the aws-cli (and in aws console)
+to provision and deploy the xlator service in AWS ECS
+
+You will need to have configured AWS CLI to use a PEM key <pem-key>
+before attempting to execute statements below
+
+
+## This sequence of instructions is to be run in aws-cli
+
+# Create a key-pair
+# (Replace <your_name_no_spaces> with your name or some other unique identifier; it should match an iam user)
+aws ec2 create-key-pair --key-name aws-<your_name_no_spaces> --query 'KeyMaterial' --output text > ~/.ssh/aws-<your_name_no_spaces>.pem
+
+# Set permissions on the key-pair
+# (Replace <your_name_no_spaces> with name or identifier you used above)
+chmod 400 ~/.ssh/aws-<your_name_no_spaces>.pem
+
+# Verify the key-pair was created
+# (Replace <your_name_no_spaces> with name or identifier you used above)
+aws ec2 describe-key-pairs --key-name aws-<your_name_no_spaces>
+
+# (Optional, skip) delete the key-pair
+# (Replace <your_name_no_spaces> with name or identifier you used above)
+aws ec2 delete-key-pair --key-name aws-<your_name_no_spaces>
+
+
+
+## This sequence of instructions is to be run in AWS Console
+
+* Login into https://<your_account>.signin.aws.amazon.com/console
+* Change region to us-east-1 (i.e., n. virginia)
+* Visit the Identity and Access Management section
+
+* Click on Roles in left hand side of pane
+* Click on Create New Role
+* Name the new role -- this is an <ecs-instance-role>  (e.g., ecsInstanceRole)
+* Click Next Step
+* Select the Role Type
+* Execute a Find in your browser (e.g., press ctrl-f); type container
+* Notice the option "Amazon EC2 role for EC2 Container Service"; select it by clicking Select
+* Click the checkbox next to option, then click Next Step
+* Click Create Role
+* Click the role you just created
+* Click Attach Policy
+* in the search box, type s3
+* Click the checkbox next to AmazonS3ReadOnlyAccess
+* Click Attach Policy
+* You should have two policies attached to this role
+
+* Click on Roles in left hand side of pane
+* Click on Create New Role
+* Came the new role -- this is an <ecs-service-role> (e.g., ecsServiceRole)
+* Click Next Step
+* Execute a Find in your browser (e.g., press ctrl-f); type container
+* Notice the option "Amazon EC2 Container Service Role"; select it by clicking Select
+* Click the checkbox next to AmazonEC2ContainerServiceRole
+* Click Next Step
+* Click Create Role
+
+
+
+## This sequence of instructions is to be run in aws-cli
+
+# Create a new security group
+aws ec2 create-security-group --group-name xlator_SG_useast1 --description "Security group for xlator on us-east-1"
+
+## (A) Copy the security-group-id from the json output above
+
+# Verify the security group has been created 
+# (Replace <security-group-id> with output from (A) above)
+aws ec2 describe-security-groups --group-id <security-group-id>
+
+# (Optional, skip) delete the security group
+# (Replace <security-group-id> with output from (A) above)
+aws ec2 delete-security-group --group-id <security-group-id>
+
+# Authorize ssh and http access for everyone 
+# (Replace <security-group-id> with output from (A) above)
+aws ec2 authorize-security-group-ingress --group-id <security-group-id> --protocol tcp --port 22 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id <security-group-id> --protocol tcp --port 80 --cidr 0.0.0.0/0
+
+# Authorize future ec2 instances to connect to elasticache (redis)
+# (Replace <security-group-id> with output from (A) above)
+aws ec2 authorize-security-group-ingress --group-id <security-group-id> --protocol tcp --port 6379 --source-group <security-group-id>
+
+# Create cluster
+aws ecs create-cluster --cluster-name xlator
+
+# Verify cluster
+aws ecs describe-clusters --clusters xlator
+
+# Create s3 bucket
+# (Replace <bucket-name> with a unique bucket name)
+aws s3api create-bucket --bucket <bucket-name>
+
+# Upload configuration to s3 bucket
+# (Replace <bucket-name> with bucket name you used above)
+aws s3 cp ecs.config s3://<bucket-name>/ecs.config
+
+# Verify configuration uploaded successfully
+# (Replace <bucket-name> with bucket name you used above)
+aws s3 ls s3://<bucket-name>
+
+# Create an ec2 instance 
+# (Replace <security-group-id> with output from (A) above)
+# (Replace <ecs-instance-role> with role name you configured in AWS Console
+# (Replace <pem-key> with your own)
+# Note: .ami image below is an official amazon ecs image
+aws ec2 run-instances --image-id ami-2b3b6041 --count 1 --instance-type t2.micro --iam-instance-profile Name=<ecs-instance-role> --key-name <pem-key> --security-group-ids <security-group-id> --user-data file://ecs.config.sh
+
+## (B) Copy the instance-id from the json output above
+
+# Get instance status 
+# (Replace <instance-id> with output from (B) statement)
+aws ec2 describe-instance-status --instance-id <instance-id> 
+
+# Verify ec2 instance is part of xlator cluster
+aws ecs list-container-instances --cluster xlator
+
+## (C) Copy the arn from the statement above
+
+# Get detailed stats about a specific container instance 
+# (Replace <arn> with output from (C) above)
+aws ecs describe-container-instances --cluster xlator --container-instances <arn>
+
+# Review the state of the cluster
+aws ecs describe-clusters --cluster xlator
+
+# (Optional, skip) delete the ec2 instance (replace <instance-id> with output from above statement)
+aws ec2 terminate-instances --instance-ids <instance-id>
+
+
+
+# Create Elasticache (Redis) instance
+# (Replace <security-group-id> with output from (A) above)
+aws elasticache create-cache-cluster --engine redis --security-group-ids <security-group-id> --cache-node-type cache.t2.micro --num-cache-nodes 1 --cache-cluster-id xlator-production
+
+# Verify the ElasticCache instance was created
+aws elasticache describe-cache-clusters
+
+# Get your ElasticCache instance's endpoint URL
+aws elasticache describe-cache-clusters --show-cache-node-info

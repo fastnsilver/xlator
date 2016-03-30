@@ -15,3 +15,9 @@ app:
     service: frengly
   info:
     version: @project.version@
+
+cloud:
+  aws:
+    region:
+      static: us-east-1
+      

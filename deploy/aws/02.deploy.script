@@ -1,0 +1,25 @@
+## This sequence of instructions is to be run in ecs-cli
+
+# Installation  -- @see http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_CLI_installation.html
+# Configuration -- @see http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_CLI_Configuration.html
+# Execution     -- @see http://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose-service.html
+
+# Configure (once)
+# (Replace $AWS_REGION with desired region (e.g., us-east-1))
+# (Replace $AWS_ACCESS_KEY_ID and $AWS_SECRET_ACCESS_KEY with your AWS credentials) 
+ecs-cli configure --region $AWS_REGION --access-key $AWS_ACCESS_KEY_ID --secret-key $AWS_SECRET_ACCESS_KEY --cluster xlator
+
+# Create service
+ecs-cli compose --project-name xlator --file xlator.yml service create
+
+# List all containers in cluster that belong to service
+ecs-cli compose --project-name xlator --file xlator.yml service ps
+
+# Start one copy of all containers in service
+ecs-cli compose --project-name xlator --file xlator.yml service start
+
+# Stop all containers in service
+ecs-cli compose --project-name xlator --file xlator.yml service stop
+
+# Delete service
+ecs-cli compose --project-name xlator --file xlator.yml service rm
