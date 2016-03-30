@@ -6,10 +6,15 @@ import com.fns.xlator.client.impl.frengly.FrenglyTranslationService;
 import com.fns.xlator.client.impl.google.GoogleClientSettings;
 import com.fns.xlator.client.impl.google.GoogleTranslationService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.metrics.CounterService;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
@@ -20,6 +25,8 @@ import org.springframework.cloud.aws.cache.config.annotation.EnableElastiCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -63,7 +70,7 @@ public class App {
         }
     }
 
-    @Profile("!aws")
+    @Profile(value = { "!aws", "!docker" })
     @Configuration
     static class LocalCacheConfig {
 
@@ -83,6 +90,26 @@ public class App {
     @EnableElastiCache({ @CacheClusterConfig(name = "translations" /*, expiration = 1209600 */) })
     static class ElastiCacheConfig {
 
+    }
+
+    @Profile("docker")
+    @Configuration
+    @AutoConfigureAfter(RedisAutoConfiguration.class)
+    @ConditionalOnBean(RedisTemplate.class)
+    static class RedisCacheConfig {
+
+        @Autowired
+        private CacheProperties cacheProperties;
+
+        @Bean
+        public RedisCacheManager cacheManager(RedisTemplate<Object, Object> redisTemplate) {
+            RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
+            List<String> cacheNames = this.cacheProperties.getCacheNames();
+            if (!cacheNames.isEmpty()) {
+                cacheManager.setCacheNames(cacheNames);
+            }
+            return cacheManager;
+        }
     }
 
 

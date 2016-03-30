@@ -14,7 +14,7 @@ public class GoogleClientSettings {
 
     private int retries = 10;
 
-    @Value("${app.defaults.locale:en}")
+    @Value("${app.defaults.locale}")
     private String defaultSource;
 
     public String getHost() {

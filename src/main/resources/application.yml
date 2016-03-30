@@ -11,13 +11,35 @@ app:
   #google:
     #key:
   defaults:
+    locale: en
     # service options are: frengly (the default) or google (if updated)
     service: frengly
   info:
     version: @project.version@
+  limits:
+    translationsPerRequest: 100
 
 cloud:
   aws:
     region:
       static: us-east-1
-      
+
+---
+
+spring:
+  profiles: docker
+    
+monitoring:
+  statsd:
+    enabled: true
+    hostname: graphite
+
+---
+
+spring:
+  profiles: aws
+    
+monitoring:
+  statsd:
+    enabled: true
+    hostname: graphite

@@ -142,7 +142,7 @@ mvn clean install
 
 Assumes proper authentication credentials have been added to `$HOME/.m2/settings.xml`. See:
 
-* [Autenticating with Private Registries](https://github.com/spotify/docker-maven-plugin#authenticating-with-private-registries)
+* [Authenticating with Private Registries](https://github.com/spotify/docker-maven-plugin#authenticating-with-private-registries)
 
 ```
 mvn clean install -DpushImage
@@ -158,8 +158,10 @@ Pull the xlator image
 
 ##### Run images
 
+You will have to set some environment variables in [xlator.env](https://github.com/fastnsilver/xlator/blob/master/deploy/docker/xlator.env) first!
+
 ```
-cd docker
+cd deploy/docker
 docker-compose up -d
 ```
 
@@ -178,14 +180,11 @@ Services are accessible via the Docker host (or IP address) and port
 
 Service           |  Port
 ------------------|-------
+Xlator            | 80
 Graphite          | 8000
 Grafana           | 3000
-Xlator            | 80
-MySQL             | 3306
-Elasticsearch     | 9200
-Logstash          | 5000
-Kibana            | 5601
 CAdvisor          | 9080
+Redis             | 6379
 
 
 ##### Stop images (and remove them)
