@@ -1,0 +1,59 @@
+# DOCKER COMPOSE CONFIGURATION
+# This file uses the version 2 docker-compose file format, described here:
+# https://docs.docker.com/compose/compose-file/#version-2
+
+version: '2'
+
+services:
+  ## INFRASTRUCTURE SERVICES
+      
+  ### GRAPHITE, STATSD
+  graphite:
+    image: hopsoft/graphite-statsd
+    ports:
+      - 8000:80
+      - 2003:2003
+      - 8125:8125
+      - 8125:8125/udp
+      - 8126:8126
+
+  ### GRAFANA
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    links:
+      - graphite
+    
+  ### CADVISOR
+  cadvisor:
+    image: google/cadvisor:latest
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 9080:8080
+
+  ### REDIS
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    
+
+  ## CORE SERVICES
+
+  ### XLATOR SERVICE
+  # Frengly service credentials intentionally not included
+  xlator:
+    image: fastnsilver/xlator
+    ports:
+      - 80:8080
+    links:
+      - graphite
+    env_file:
+      - ./xlator.env

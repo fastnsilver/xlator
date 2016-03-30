@@ -47,7 +47,7 @@ public class TranslationController {
     @Autowired
     public TranslationController(CacheService cacheService, TranslationService translationService,
             @Value("${app.defaults.locale}") String defaultLocale,
-            @Value("${app.limits.translationsPerRequest:25}") int maximumTranslations) {
+            @Value("${app.limits.translationsPerRequest}") int maximumTranslations) {
         this.cacheService = cacheService;
         this.translationService = translationService;
         this.defaultLocale = defaultLocale;
