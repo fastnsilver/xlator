@@ -21,8 +21,8 @@ public class CacheService {
 
     @CacheEvict("translations")
     public void evictTranslation(String source, String target, String text) {
-        counterService.increment("services.frengly.cacheKey.eviction");
-        log.info("Key w/ source [{}], target [{}], and text [{}] removed from cache!");
+        counterService.increment("services.cache.key.eviction");
+        log.info("Key w/ source [{}], target [{}], and text [{}] removed from cache!", source, target, text);
     }
 
 }
