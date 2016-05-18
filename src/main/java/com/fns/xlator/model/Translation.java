@@ -5,9 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.io.Serializable;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(value = { "source", "target", "text", "translation" })
-public class Translation {
+public class Translation implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String source;
     private String target;
