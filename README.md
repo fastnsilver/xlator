@@ -21,6 +21,9 @@ Then you'll need to configure [application.yml](https://raw.githubusercontent.co
 
 Please review the [disclaimer](https://cloud.google.com/translate/v2/attribution#disclaimer) if you configure `xlator` to use Google Translate API.
 
+
+The recommended way to update the application properties mentioned above is to create a `config` directory underneath `src/main/resources` and just add the key-value pairs mentioned above to it. This will serve as your application overrides.  Consult the [Application property files](http://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html#boot-features-external-config-application-property-files) section of the Spring Boot documentation for further details.
+
 ## Service Endpoints
 
 `GET /translation/source/{src}/target/{target}/text/{text}`
@@ -58,7 +61,7 @@ Please review the [disclaimer](https://cloud.google.com/translate/v2/attribution
 
 This is a [Spring Boot](http://projects.spring.io/spring-boot/) application.  
 
-It is initialized with: [App.java](https://github.com/fastnsilver/xlator/blob/master/src/main/java/com/fns/xlator/App.java)
+It is initialized with: [Application.java](https://github.com/fastnsilver/xlator/blob/master/src/main/java/com/fns/xlator/Application.java)
 
 
 ### Prerequisites
