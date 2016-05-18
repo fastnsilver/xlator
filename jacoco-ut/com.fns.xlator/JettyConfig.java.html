@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>JettyConfig.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xlator</a> &gt; <a href="index.source.html" class="el_package">com.fns.xlator</a> &gt; <span class="el_source">JettyConfig.java</span></div><h1>JettyConfig.java</h1><pre class="source lang-java linenums">package com.fns.xlator;
+
+import static com.codahale.metrics.MetricRegistry.name;
+
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.RatioGauge;
+
+import org.eclipse.jetty.server.LowResourceMonitor;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.embedded.jetty.JettyEmbeddedServletContainerFactory;
+import org.springframework.boot.context.embedded.jetty.JettyServerCustomizer;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
+@Configuration
+@EnableConfigurationProperties
+<span class="fc" id="L23">class JettyConfig {</span>
+
+    @Configuration
+    @ConfigurationProperties(prefix = &quot;jetty.threadPool&quot;)
+<span class="fc" id="L27">    static class JettyThreadPoolSettings {</span>
+
+<span class="fc" id="L29">        private Integer minThreads = 8;</span>
+<span class="fc" id="L30">        private Integer maxThreads = 32;</span>
+<span class="fc" id="L31">        private Integer idleTimeout = 30000;</span>
+        private boolean detailedDump;
+
+        public Integer getMinThreads() {
+<span class="nc" id="L35">            return minThreads;</span>
+        }
+
+        public void setMinThreads(Integer minThreads) {
+<span class="nc" id="L39">            this.minThreads = minThreads;</span>
+<span class="nc" id="L40">        }</span>
+
+        public Integer getMaxThreads() {
+<span class="nc" id="L43">            return maxThreads;</span>
+        }
+
+        public void setMaxThreads(Integer maxThreads) {
+<span class="nc" id="L47">            this.maxThreads = maxThreads;</span>
+<span class="nc" id="L48">        }</span>
+
+        public Integer getIdleTimeout() {
+<span class="nc" id="L51">            return idleTimeout;</span>
+        }
+
+        public void setIdleTimeout(Integer idleTimeout) {
+<span class="nc" id="L55">            this.idleTimeout = idleTimeout;</span>
+<span class="nc" id="L56">        }</span>
+
+        public boolean isDetailedDump() {
+<span class="nc" id="L59">            return detailedDump;</span>
+        }
+
+        public void setDetailedDump(boolean detailedDump) {
+<span class="nc" id="L63">            this.detailedDump = detailedDump;</span>
+<span class="nc" id="L64">        }</span>
+
+    }
+
+    @Configuration
+    @ConfigurationProperties(prefix = &quot;jetty.lowResources&quot;)
+    // @see http://eclipse.org/jetty/documentation/current/limit-load.html
+    // @see http://eclipse.org/jetty/documentation/current/embedding-jetty.html#d0e19129
+<span class="fc" id="L72">    static class JettyLowResourceMonitorSettings {</span>
+        // all durations in milliseconds
+
+<span class="fc" id="L75">        private Integer period = 1000;</span>
+<span class="fc" id="L76">        private Integer idleTimeout = 200;</span>
+<span class="fc" id="L77">        private boolean monitorThreads = true;</span>
+<span class="fc" id="L78">        private Integer maxConnections = 0;</span>
+<span class="fc" id="L79">        private Integer maxMemory = 0;</span>
+<span class="fc" id="L80">        private Integer maxLowResourcesTime = 5000;</span>
+
+        public Integer getPeriod() {
+<span class="nc" id="L83">            return period;</span>
+        }
+
+        public void setPeriod(Integer period) {
+<span class="nc" id="L87">            this.period = period;</span>
+<span class="nc" id="L88">        }</span>
+
+        public Integer getIdleTimeout() {
+<span class="nc" id="L91">            return idleTimeout;</span>
+        }
+
+        public void setIdleTimeout(Integer idleTimeout) {
+<span class="nc" id="L95">            this.idleTimeout = idleTimeout;</span>
+<span class="nc" id="L96">        }</span>
+
+        public boolean isMonitorThreads() {
+<span class="nc" id="L99">            return monitorThreads;</span>
+        }
+
+        public void setMonitorThreads(boolean monitorThreads) {
+<span class="nc" id="L103">            this.monitorThreads = monitorThreads;</span>
+<span class="nc" id="L104">        }</span>
+
+        public Integer getMaxConnections() {
+<span class="nc" id="L107">            return maxConnections;</span>
+        }
+
+        public void setMaxConnections(Integer maxConnections) {
+<span class="nc" id="L111">            this.maxConnections = maxConnections;</span>
+<span class="nc" id="L112">        }</span>
+
+        public Integer getMaxMemory() {
+<span class="nc" id="L115">            return maxMemory;</span>
+        }
+
+        public void setMaxMemory(Integer maxMemory) {
+<span class="nc" id="L119">            this.maxMemory = maxMemory;</span>
+<span class="nc" id="L120">        }</span>
+
+        public Integer getMaxLowResourcesTime() {
+<span class="nc" id="L123">            return maxLowResourcesTime;</span>
+        }
+
+        public void setMaxLowResourcesTime(Integer maxLowResourcesTime) {
+<span class="nc" id="L127">            this.maxLowResourcesTime = maxLowResourcesTime;</span>
+<span class="nc" id="L128">        }</span>
+
+    }
+
+    // @see http://wiki.eclipse.org/Jetty/Howto/High_Load
+    // @see http://jdpgrailsdev.github.io/blog/2014/10/07/spring_boot_jetty_thread_pool.html
+    @Primary
+    @Bean
+    public JettyEmbeddedServletContainerFactory jettyEmbeddedServletContainerFactory(MetricRegistry metricRegistry,
+            JettyThreadPoolSettings jettyThreadPoolSettings,
+            JettyLowResourceMonitorSettings jettyLowResourceMonitorSettings,
+            @Value(&quot;${server.port:8080}&quot;) final int port) {
+<span class="fc" id="L140">        final JettyEmbeddedServletContainerFactory factory = new JettyEmbeddedServletContainerFactory(port);</span>
+<span class="fc" id="L141">        factory.addServerCustomizers(</span>
+                new InstrumentedJettyServer(metricRegistry, jettyThreadPoolSettings, jettyLowResourceMonitorSettings));
+<span class="fc" id="L143">        return factory;</span>
+    }
+
+    private class InstrumentedJettyServer implements JettyServerCustomizer {
+
+        private final MetricRegistry metricRegistry;
+        private final JettyThreadPoolSettings jettyThreadPoolSettings;
+        private final JettyLowResourceMonitorSettings jettyLowResourceMonitorSettings;
+
+        public InstrumentedJettyServer(MetricRegistry metricRegistry, JettyThreadPoolSettings jettyThreadPoolSettings,
+<span class="fc" id="L153">                JettyLowResourceMonitorSettings jettyLowResourceMonitorSettings) {</span>
+<span class="fc" id="L154">            this.metricRegistry = metricRegistry;</span>
+<span class="fc" id="L155">            this.jettyThreadPoolSettings = jettyThreadPoolSettings;</span>
+<span class="fc" id="L156">            this.jettyLowResourceMonitorSettings = jettyLowResourceMonitorSettings;</span>
+<span class="fc" id="L157">        }</span>
+
+        @Override
+        public void customize(Server server) {
+<span class="nc" id="L161">            QueuedThreadPool pool = (QueuedThreadPool) server.getThreadPool();</span>
+<span class="nc" id="L162">            pool.setName(&quot;jetty-pool&quot;);</span>
+
+<span class="nc" id="L164">            configureThreadPool(pool);</span>
+<span class="nc" id="L165">            configureLowResourceMonitor(server);</span>
+<span class="nc" id="L166">            configureMetrics(pool);</span>
+<span class="nc" id="L167">        }</span>
+
+        protected void configureThreadPool(QueuedThreadPool pool) {
+            // override QueuedThreadPool defaults
+<span class="nc" id="L171">            pool.setMaxThreads(jettyThreadPoolSettings.getMaxThreads());</span>
+<span class="nc" id="L172">            pool.setMinThreads(jettyThreadPoolSettings.getMinThreads());</span>
+<span class="nc" id="L173">            pool.setIdleTimeout(jettyThreadPoolSettings.getIdleTimeout());</span>
+<span class="nc" id="L174">            pool.setDetailedDump(jettyThreadPoolSettings.isDetailedDump());</span>
+<span class="nc" id="L175">        }</span>
+
+        protected void configureLowResourceMonitor(Server server) {
+            // monitor low resources
+<span class="nc" id="L179">            LowResourceMonitor lowResourcesMonitor = new LowResourceMonitor(server);</span>
+<span class="nc" id="L180">            lowResourcesMonitor.setPeriod(jettyLowResourceMonitorSettings.getPeriod());</span>
+<span class="nc" id="L181">            lowResourcesMonitor.setLowResourcesIdleTimeout(jettyLowResourceMonitorSettings.getIdleTimeout());</span>
+<span class="nc" id="L182">            lowResourcesMonitor.setMonitorThreads(jettyLowResourceMonitorSettings.isMonitorThreads());</span>
+<span class="nc" id="L183">            lowResourcesMonitor.setMaxConnections(jettyLowResourceMonitorSettings.getMaxConnections());</span>
+<span class="nc" id="L184">            lowResourcesMonitor.setMaxMemory(jettyLowResourceMonitorSettings.getMaxMemory());</span>
+<span class="nc" id="L185">            lowResourcesMonitor.setMaxLowResourcesTime(jettyLowResourceMonitorSettings.getMaxLowResourcesTime());</span>
+<span class="nc" id="L186">            server.addBean(lowResourcesMonitor);</span>
+<span class="nc" id="L187">        }</span>
+
+        protected void configureMetrics(QueuedThreadPool pool) {
+            // metrics
+<span class="nc" id="L191">            metricRegistry.register(name(pool.getName(), &quot;utilization&quot;), new RatioGauge() {</span>
+                @Override
+                protected Ratio getRatio() {
+<span class="nc" id="L194">                    return Ratio.of(pool.getThreads() - pool.getIdleThreads(), pool.getThreads());</span>
+                }
+            });
+<span class="nc" id="L197">            metricRegistry.register(name(pool.getName(), &quot;utilization-max&quot;), new RatioGauge() {</span>
+                @Override
+                protected Ratio getRatio() {
+<span class="nc" id="L200">                    return Ratio.of(pool.getThreads() - pool.getIdleThreads(), pool.getMaxThreads());</span>
+                }
+            });
+<span class="nc" id="L203">            metricRegistry.register(name(pool.getName(), &quot;size&quot;), new Gauge&lt;Integer&gt;() {</span>
+                @Override
+                public Integer getValue() {
+<span class="nc" id="L206">                    return pool.getThreads();</span>
+                }
+            });
+<span class="nc" id="L209">            metricRegistry.register(name(pool.getName(), &quot;jobs&quot;), new Gauge&lt;Integer&gt;() {</span>
+                @Override
+                public Integer getValue() {
+                    // This assumes the QueuedThreadPool is using a BlockingArrayQueue or
+                    // ArrayBlockingQueue for its queue, and is therefore a constant-time operation.
+<span class="nc" id="L214">                    return pool.getQueueSize();</span>
+                }
+            });
+<span class="nc" id="L217">        }</span>
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

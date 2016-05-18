@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>package com.fns.xlator.controller;<a name="line.1"></a>
+<span class="sourceLineNo">002</span><a name="line.2"></a>
+<span class="sourceLineNo">003</span>import com.fns.xlator.client.api.CacheService;<a name="line.3"></a>
+<span class="sourceLineNo">004</span>import com.fns.xlator.client.api.TranslationService;<a name="line.4"></a>
+<span class="sourceLineNo">005</span>import com.fns.xlator.client.impl.TranslationException;<a name="line.5"></a>
+<span class="sourceLineNo">006</span>import com.fns.xlator.model.ErrorResponse;<a name="line.6"></a>
+<span class="sourceLineNo">007</span>import com.fns.xlator.model.Translation;<a name="line.7"></a>
+<span class="sourceLineNo">008</span>import com.fns.xlator.model.TranslationRequest;<a name="line.8"></a>
+<span class="sourceLineNo">009</span>import com.fns.xlator.model.Translations;<a name="line.9"></a>
+<span class="sourceLineNo">010</span><a name="line.10"></a>
+<span class="sourceLineNo">011</span>import org.slf4j.Logger;<a name="line.11"></a>
+<span class="sourceLineNo">012</span>import org.slf4j.LoggerFactory;<a name="line.12"></a>
+<span class="sourceLineNo">013</span>import org.springframework.beans.factory.annotation.Autowired;<a name="line.13"></a>
+<span class="sourceLineNo">014</span>import org.springframework.beans.factory.annotation.Value;<a name="line.14"></a>
+<span class="sourceLineNo">015</span>import org.springframework.http.ResponseEntity;<a name="line.15"></a>
+<span class="sourceLineNo">016</span>import org.springframework.util.Assert;<a name="line.16"></a>
+<span class="sourceLineNo">017</span>import org.springframework.web.bind.annotation.ExceptionHandler;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>import org.springframework.web.bind.annotation.PathVariable;<a name="line.18"></a>
+<span class="sourceLineNo">019</span>import org.springframework.web.bind.annotation.RequestBody;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import org.springframework.web.bind.annotation.RequestMapping;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import org.springframework.web.bind.annotation.RequestMethod;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import org.springframework.web.bind.annotation.RestController;<a name="line.22"></a>
+<span class="sourceLineNo">023</span><a name="line.23"></a>
+<span class="sourceLineNo">024</span>import java.util.ArrayList;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import java.util.Arrays;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import java.util.List;<a name="line.26"></a>
+<span class="sourceLineNo">027</span><a name="line.27"></a>
+<span class="sourceLineNo">028</span>import javax.servlet.http.HttpServletRequest;<a name="line.28"></a>
+<span class="sourceLineNo">029</span><a name="line.29"></a>
+<span class="sourceLineNo">030</span>import io.swagger.annotations.Api;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>import io.swagger.annotations.ApiOperation;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>import io.swagger.annotations.ApiResponse;<a name="line.32"></a>
+<span class="sourceLineNo">033</span>import io.swagger.annotations.ApiResponses;<a name="line.33"></a>
+<span class="sourceLineNo">034</span><a name="line.34"></a>
+<span class="sourceLineNo">035</span>@RestController<a name="line.35"></a>
+<span class="sourceLineNo">036</span>@RequestMapping("/translation")<a name="line.36"></a>
+<span class="sourceLineNo">037</span>@Api(value = "translation", produces = "application/json")<a name="line.37"></a>
+<span class="sourceLineNo">038</span>public class TranslationController {<a name="line.38"></a>
+<span class="sourceLineNo">039</span><a name="line.39"></a>
+<span class="sourceLineNo">040</span>    private final Logger log = LoggerFactory.getLogger(getClass());<a name="line.40"></a>
+<span class="sourceLineNo">041</span><a name="line.41"></a>
+<span class="sourceLineNo">042</span>    private CacheService cacheService;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    private TranslationService translationService;<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    private String defaultLocale;<a name="line.44"></a>
+<span class="sourceLineNo">045</span>    private int maximumTranslations;<a name="line.45"></a>
+<span class="sourceLineNo">046</span><a name="line.46"></a>
+<span class="sourceLineNo">047</span>    @Autowired<a name="line.47"></a>
+<span class="sourceLineNo">048</span>    public TranslationController(CacheService cacheService, TranslationService translationService,<a name="line.48"></a>
+<span class="sourceLineNo">049</span>            @Value("${app.defaults.locale}") String defaultLocale,<a name="line.49"></a>
+<span class="sourceLineNo">050</span>            @Value("${app.limits.translationsPerRequest}") int maximumTranslations) {<a name="line.50"></a>
+<span class="sourceLineNo">051</span>        this.cacheService = cacheService;<a name="line.51"></a>
+<span class="sourceLineNo">052</span>        this.translationService = translationService;<a name="line.52"></a>
+<span class="sourceLineNo">053</span>        this.defaultLocale = defaultLocale;<a name="line.53"></a>
+<span class="sourceLineNo">054</span>        this.maximumTranslations = maximumTranslations;<a name="line.54"></a>
+<span class="sourceLineNo">055</span>    }<a name="line.55"></a>
+<span class="sourceLineNo">056</span><a name="line.56"></a>
+<span class="sourceLineNo">057</span>    <a name="line.57"></a>
+<span class="sourceLineNo">058</span>    protected ResponseEntity&lt;Translations&gt; fetchTranslations(TranslationRequest[] translationRequests,<a name="line.58"></a>
+<span class="sourceLineNo">059</span>            HttpServletRequest request) {<a name="line.59"></a>
+<span class="sourceLineNo">060</span>        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();<a name="line.60"></a>
+<span class="sourceLineNo">061</span>        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();<a name="line.61"></a>
+<span class="sourceLineNo">062</span>        Assert.isTrue(translationRequests.length &lt;= maximumTranslations, String.format(<a name="line.62"></a>
+<span class="sourceLineNo">063</span>                "[Assertion failed] - No more than %d translations may be requested at once!", maximumTranslations));<a name="line.63"></a>
+<span class="sourceLineNo">064</span>        for (TranslationRequest tr : translationRequests) {<a name="line.64"></a>
+<span class="sourceLineNo">065</span>            try {<a name="line.65"></a>
+<span class="sourceLineNo">066</span>                translations.add(translationService.obtainTranslation(tr.getSource(), tr.getTarget(), tr.getText()));<a name="line.66"></a>
+<span class="sourceLineNo">067</span>            } catch (IllegalArgumentException | TranslationException e) {<a name="line.67"></a>
+<span class="sourceLineNo">068</span>                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),<a name="line.68"></a>
+<span class="sourceLineNo">069</span>                        e.getMessage()));<a name="line.69"></a>
+<span class="sourceLineNo">070</span>            }<a name="line.70"></a>
+<span class="sourceLineNo">071</span>        }<a name="line.71"></a>
+<span class="sourceLineNo">072</span>        Translations result = new Translations(translations, errors);<a name="line.72"></a>
+<span class="sourceLineNo">073</span>        return ResponseEntity.ok(result);<a name="line.73"></a>
+<span class="sourceLineNo">074</span>    }<a name="line.74"></a>
+<span class="sourceLineNo">075</span><a name="line.75"></a>
+<span class="sourceLineNo">076</span>    protected ResponseEntity&lt;Translations&gt; fetchTranslations(String source, String targets, String text,<a name="line.76"></a>
+<span class="sourceLineNo">077</span>            HttpServletRequest request) {<a name="line.77"></a>
+<span class="sourceLineNo">078</span>        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();<a name="line.78"></a>
+<span class="sourceLineNo">079</span>        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();<a name="line.79"></a>
+<span class="sourceLineNo">080</span>        List&lt;String&gt; t = Arrays.asList(targets.split("\\s*,\\s*"));<a name="line.80"></a>
+<span class="sourceLineNo">081</span>        Assert.isTrue(t.size() &lt;= maximumTranslations, String.format(<a name="line.81"></a>
+<span class="sourceLineNo">082</span>                "[Assertion failed] - No more than %d translations may be requested at once!", maximumTranslations));<a name="line.82"></a>
+<span class="sourceLineNo">083</span>        for (String target : t) {<a name="line.83"></a>
+<span class="sourceLineNo">084</span>            try {<a name="line.84"></a>
+<span class="sourceLineNo">085</span>                translations.add(translationService.obtainTranslation(source, target, text));<a name="line.85"></a>
+<span class="sourceLineNo">086</span>            } catch (IllegalArgumentException | TranslationException e) {<a name="line.86"></a>
+<span class="sourceLineNo">087</span>                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),<a name="line.87"></a>
+<span class="sourceLineNo">088</span>                        e.getMessage()));<a name="line.88"></a>
+<span class="sourceLineNo">089</span>            }<a name="line.89"></a>
+<span class="sourceLineNo">090</span>        }<a name="line.90"></a>
+<span class="sourceLineNo">091</span>        Translations result = new Translations(translations, errors);<a name="line.91"></a>
+<span class="sourceLineNo">092</span>        return ResponseEntity.ok(result);<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    }<a name="line.93"></a>
+<span class="sourceLineNo">094</span><a name="line.94"></a>
+<span class="sourceLineNo">095</span><a name="line.95"></a>
+<span class="sourceLineNo">096</span>    @RequestMapping(value = "/source/{src}/target/{target}/text/{text}", method = RequestMethod.GET)<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    @ApiOperation(httpMethod = "GET", notes = "Obtain a translation.", value = "/translation/source/{src}/target/{target}/text/{text}")<a name="line.97"></a>
+<span class="sourceLineNo">098</span>    @ApiResponses(value = { <a name="line.98"></a>
+<span class="sourceLineNo">099</span>            @ApiResponse(code = 200, message = "Successfully obtained translation."),<a name="line.99"></a>
+<span class="sourceLineNo">100</span>            @ApiResponse(code = 400, message = "Bad request."),<a name="line.100"></a>
+<span class="sourceLineNo">101</span>            @ApiResponse(code = 500, message = "Internal server error.") <a name="line.101"></a>
+<span class="sourceLineNo">102</span>    })<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    public ResponseEntity&lt;Translation&gt; obtainTranslation(@PathVariable("src") String source,<a name="line.103"></a>
+<span class="sourceLineNo">104</span>            @PathVariable("target") String target, @PathVariable("text") String text) {<a name="line.104"></a>
+<span class="sourceLineNo">105</span>        return ResponseEntity.ok(translationService.obtainTranslation(source, target, text));<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    }<a name="line.106"></a>
+<span class="sourceLineNo">107</span><a name="line.107"></a>
+<span class="sourceLineNo">108</span>    // convenience, uses a configurable default locale<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    @RequestMapping(value = "/target/{target}/text/{text}", method = RequestMethod.GET)<a name="line.109"></a>
+<span class="sourceLineNo">110</span>    @ApiOperation(httpMethod = "GET", notes = "Obtain a translation using default locale.", value = "/translation/target/{target}/text/{text}")<a name="line.110"></a>
+<span class="sourceLineNo">111</span>    @ApiResponses(value = { <a name="line.111"></a>
+<span class="sourceLineNo">112</span>            @ApiResponse(code = 200, message = "Successfully obtained translation."),<a name="line.112"></a>
+<span class="sourceLineNo">113</span>            @ApiResponse(code = 400, message = "Bad request."),<a name="line.113"></a>
+<span class="sourceLineNo">114</span>            @ApiResponse(code = 500, message = "Internal server error.") <a name="line.114"></a>
+<span class="sourceLineNo">115</span>    })<a name="line.115"></a>
+<span class="sourceLineNo">116</span>    public ResponseEntity&lt;Translation&gt; obtainTranslation(@PathVariable("target") String target,<a name="line.116"></a>
+<span class="sourceLineNo">117</span>            @PathVariable("text") String text) {<a name="line.117"></a>
+<span class="sourceLineNo">118</span>        return ResponseEntity.ok(translationService.obtainTranslation(defaultLocale, target, text));<a name="line.118"></a>
+<span class="sourceLineNo">119</span>    }<a name="line.119"></a>
+<span class="sourceLineNo">120</span><a name="line.120"></a>
+<span class="sourceLineNo">121</span>    // convenience, source x n target combinations for a text<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    @RequestMapping(value = "/source/{src}/targets/{targets}/text/{text}", method = RequestMethod.GET)<a name="line.122"></a>
+<span class="sourceLineNo">123</span>    @ApiOperation(httpMethod = "GET", notes = "Obtain translations for each target locale.", value = "/translation/source/{src}/targets/{targets}/text/{text}")<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    @ApiResponses(value = { <a name="line.124"></a>
+<span class="sourceLineNo">125</span>            @ApiResponse(code = 200, message = "Obtained translations.  (Report errors with any target)."),<a name="line.125"></a>
+<span class="sourceLineNo">126</span>            @ApiResponse(code = 400, message = "Bad request."),<a name="line.126"></a>
+<span class="sourceLineNo">127</span>            @ApiResponse(code = 500, message = "Internal server error.") <a name="line.127"></a>
+<span class="sourceLineNo">128</span>    })<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    public ResponseEntity&lt;Translations&gt; obtainTranslations(@PathVariable("src") String source,<a name="line.129"></a>
+<span class="sourceLineNo">130</span>            @PathVariable("targets") String targets, @PathVariable("text") String text, HttpServletRequest request) {<a name="line.130"></a>
+<span class="sourceLineNo">131</span>        return fetchTranslations(source, targets, text, request);<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    }<a name="line.132"></a>
+<span class="sourceLineNo">133</span><a name="line.133"></a>
+<span class="sourceLineNo">134</span>    // convenience, default configurable locale x n target combinations for a text<a name="line.134"></a>
+<span class="sourceLineNo">135</span>    @RequestMapping(value = "/targets/{targets}/text/{text}", method = RequestMethod.GET)<a name="line.135"></a>
+<span class="sourceLineNo">136</span>    @ApiOperation(httpMethod = "GET", notes = "Obtain translations for each target locale using default locale.", value = "/translation/targets/{targets}/text/{text}")<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    @ApiResponses(value = { <a name="line.137"></a>
+<span class="sourceLineNo">138</span>            @ApiResponse(code = 200, message = "Obtained translations.  (Report errors with any target)."),<a name="line.138"></a>
+<span class="sourceLineNo">139</span>            @ApiResponse(code = 400, message = "Bad request."),<a name="line.139"></a>
+<span class="sourceLineNo">140</span>            @ApiResponse(code = 500, message = "Internal server error.") <a name="line.140"></a>
+<span class="sourceLineNo">141</span>    })<a name="line.141"></a>
+<span class="sourceLineNo">142</span>    public ResponseEntity&lt;Translations&gt; obtainTranslations(@PathVariable("targets") String targets,<a name="line.142"></a>
+<span class="sourceLineNo">143</span>            @PathVariable("text") String text, HttpServletRequest request) {<a name="line.143"></a>
+<span class="sourceLineNo">144</span>        return fetchTranslations(defaultLocale, targets, text, request);<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    }<a name="line.145"></a>
+<span class="sourceLineNo">146</span><a name="line.146"></a>
+<span class="sourceLineNo">147</span>    // most flexible option<a name="line.147"></a>
+<span class="sourceLineNo">148</span>    @RequestMapping(value = "/", method = RequestMethod.POST)<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    @ApiOperation(httpMethod = "POST", notes = "Obtain translations.", value = "/translation/")<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    @ApiResponses(value = { <a name="line.150"></a>
+<span class="sourceLineNo">151</span>            @ApiResponse(code = 200, message = "Obtained translations.  (Report errors with any source-target-text combination)."),<a name="line.151"></a>
+<span class="sourceLineNo">152</span>            @ApiResponse(code = 400, message = "Bad request."),<a name="line.152"></a>
+<span class="sourceLineNo">153</span>            @ApiResponse(code = 500, message = "Internal server error.") <a name="line.153"></a>
+<span class="sourceLineNo">154</span>    })<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    public ResponseEntity&lt;Translations&gt; obtainTranslations(@RequestBody TranslationRequest[] translationRequests,<a name="line.155"></a>
+<span class="sourceLineNo">156</span>            HttpServletRequest request) {<a name="line.156"></a>
+<span class="sourceLineNo">157</span>        return fetchTranslations(translationRequests, request);<a name="line.157"></a>
+<span class="sourceLineNo">158</span>    }<a name="line.158"></a>
+<span class="sourceLineNo">159</span><a name="line.159"></a>
+<span class="sourceLineNo">160</span>    @RequestMapping(value = "/source/{src}/target/{target}/text/{text}", method = RequestMethod.DELETE)<a name="line.160"></a>
+<span class="sourceLineNo">161</span>    @ApiOperation(httpMethod = "DELETE", notes = "Evict cache-key for a previously obtained translation.", value = "/translation/source/{src}/target/{target}/text/{text}")<a name="line.161"></a>
+<span class="sourceLineNo">162</span>    @ApiResponses(value = { <a name="line.162"></a>
+<span class="sourceLineNo">163</span>            @ApiResponse(code = 204, message = "Successfully evicted key."),<a name="line.163"></a>
+<span class="sourceLineNo">164</span>            @ApiResponse(code = 500, message = "Internal server error.") <a name="line.164"></a>
+<span class="sourceLineNo">165</span>    })<a name="line.165"></a>
+<span class="sourceLineNo">166</span>    public ResponseEntity&lt;?&gt; invalidateCacheKey(@PathVariable("src") String source,<a name="line.166"></a>
+<span class="sourceLineNo">167</span>            @PathVariable("target") String target, @PathVariable("text") String text) {<a name="line.167"></a>
+<span class="sourceLineNo">168</span>        cacheService.evictTranslation(source, target, text);<a name="line.168"></a>
+<span class="sourceLineNo">169</span>        log.info(String.format("Evicted cache key for /source/%s/target/%s/text/%s", source, target, text));<a name="line.169"></a>
+<span class="sourceLineNo">170</span>        return ResponseEntity.noContent().build();<a name="line.170"></a>
+<span class="sourceLineNo">171</span>    }<a name="line.171"></a>
+<span class="sourceLineNo">172</span><a name="line.172"></a>
+<span class="sourceLineNo">173</span>    <a name="line.173"></a>
+<span class="sourceLineNo">174</span>    @ExceptionHandler({ IllegalArgumentException.class, TranslationException.class })<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    protected ResponseEntity&lt;ErrorResponse&gt; badRequest(Exception e, HttpServletRequest hsr) {<a name="line.175"></a>
+<span class="sourceLineNo">176</span>        ErrorResponse er = new ErrorResponse(hsr.getMethod(), hsr.getRequestURI(), hsr.getQueryString(),<a name="line.176"></a>
+<span class="sourceLineNo">177</span>                e.getMessage());<a name="line.177"></a>
+<span class="sourceLineNo">178</span>        log.error(er.asLog());<a name="line.178"></a>
+<span class="sourceLineNo">179</span>        return ResponseEntity.badRequest().body(er);<a name="line.179"></a>
+<span class="sourceLineNo">180</span>    }<a name="line.180"></a>
+<span class="sourceLineNo">181</span><a name="line.181"></a>
+<span class="sourceLineNo">182</span>}<a name="line.182"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

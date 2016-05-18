@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>RedisCacheStatisticsProvider.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xlator</a> &gt; <a href="index.source.html" class="el_package">com.fns.xlator.cache</a> &gt; <span class="el_source">RedisCacheStatisticsProvider.java</span></div><h1>RedisCacheStatisticsProvider.java</h1><pre class="source lang-java linenums">package com.fns.xlator.cache;
+
+import org.springframework.boot.actuate.cache.CacheStatistics;
+import org.springframework.boot.actuate.cache.CacheStatisticsProvider;
+import org.springframework.boot.actuate.cache.DefaultCacheStatistics;
+import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.cache.RedisCache;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisConnectionUtils;
+
+import java.util.Properties;
+
+// Naive stats collection implementation, only capable of working with one cluster node
+// to be replaced when https://github.com/spring-projects/spring-boot/issues/4966 is addressed
+public class RedisCacheStatisticsProvider implements CacheStatisticsProvider&lt;RedisCache&gt; {
+
+    private final RedisConnectionFactory redisConnectionFactory;
+
+<span class="nc" id="L20">    public RedisCacheStatisticsProvider(RedisConnectionFactory redisConnectionFactory) {</span>
+<span class="nc" id="L21">        this.redisConnectionFactory = redisConnectionFactory;</span>
+<span class="nc" id="L22">    }</span>
+
+    @Override
+    public CacheStatistics getCacheStatistics(CacheManager cacheManager, RedisCache cache) {
+<span class="nc" id="L26">        DefaultCacheStatistics statistics = new DefaultCacheStatistics();</span>
+        // @see http://redis.io/commands/INFO
+<span class="nc" id="L28">        RedisConnection connection = RedisConnectionUtils.getConnection(this.redisConnectionFactory);</span>
+        try {
+<span class="nc" id="L30">            Properties props = connection.info();</span>
+<span class="nc" id="L31">            Long hitCount = Long.parseLong(props.getProperty(&quot;keyspace_hits&quot;));</span>
+<span class="nc" id="L32">            Long missCount = Long.parseLong(props.getProperty(&quot;keyspace_misses&quot;));</span>
+<span class="nc" id="L33">            statistics.setGetCacheCounts(hitCount, missCount);</span>
+        } finally {
+<span class="nc" id="L35">            RedisConnectionUtils.releaseConnection(connection, this.redisConnectionFactory);</span>
+<span class="nc" id="L36">        }</span>
+<span class="nc" id="L37">        return statistics;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

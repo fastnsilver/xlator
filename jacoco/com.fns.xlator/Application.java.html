@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Application.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xlator</a> &gt; <a href="index.source.html" class="el_package">com.fns.xlator</a> &gt; <span class="el_source">Application.java</span></div><h1>Application.java</h1><pre class="source lang-java linenums">package com.fns.xlator;
+
+import com.fns.xlator.cache.RedisCacheMonitor;
+import com.fns.xlator.cache.RedisCacheStatisticsProvider;
+import com.fns.xlator.client.api.TranslationService;
+import com.fns.xlator.client.impl.frengly.FrenglyClientSettings;
+import com.fns.xlator.client.impl.frengly.FrenglyTranslationService;
+import com.fns.xlator.client.impl.google.GoogleClientSettings;
+import com.fns.xlator.client.impl.google.GoogleTranslationService;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.actuate.cache.ConcurrentMapCacheStatisticsProvider;
+import org.springframework.boot.actuate.metrics.CounterService;
+import org.springframework.boot.actuate.metrics.dropwizard.DropwizardMetricServices;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.support.SimpleCacheManager;
+import org.springframework.cloud.aws.cache.config.annotation.CacheClusterConfig;
+import org.springframework.cloud.aws.cache.config.annotation.EnableElastiCache;
+import org.springframework.cloud.aws.context.config.annotation.EnableContextCredentials;
+import org.springframework.cloud.aws.context.config.annotation.EnableContextInstanceData;
+import org.springframework.cloud.aws.context.config.annotation.EnableContextRegion;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.client.RestTemplate;
+
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+
+// special thanks to https://github.com/spring-cloud-samples/aws-refapp/blob/master/src/main/java/org/springframework/cloud/aws/sample/ReferenceApplication.java
+
+@Configuration
+@ComponentScan
+<span class="fc" id="L47">public class Application {</span>
+
+    public static final String CACHE_NAME = &quot;translations&quot;;
+
+    @Configuration
+    @ConditionalOnProperty(prefix = &quot;app.defaults&quot;, name = &quot;service&quot;, havingValue = &quot;google&quot;)
+<span class="fc" id="L53">    static class GoogleApiConfig {</span>
+
+        @Bean
+        public GoogleClientSettings googleClientSettings() {
+<span class="fc" id="L57">            return new GoogleClientSettings();</span>
+        }
+
+        @Bean
+        public TranslationService googleTranslationService(RestTemplate restTemplate, GoogleClientSettings settings,
+                CounterService counterService) {
+<span class="fc" id="L63">            return new GoogleTranslationService(restTemplate, settings, counterService);</span>
+        }
+
+    }
+
+    @Configuration
+    @ConditionalOnProperty(prefix = &quot;app.defaults&quot;, name = &quot;service&quot;, havingValue = &quot;frengly&quot;)
+<span class="nc" id="L70">    static class FrenglyApiConfig {</span>
+
+        @Bean
+        public FrenglyClientSettings frenglyClientSettings() {
+<span class="nc" id="L74">            return new FrenglyClientSettings();</span>
+        }
+
+        @Bean
+        public TranslationService frenglyTranslationService(RestTemplate restTemplate, FrenglyClientSettings settings,
+                CounterService counterService) {
+<span class="nc" id="L80">            return new FrenglyTranslationService(restTemplate, settings, counterService);</span>
+        }
+    }
+
+    @Configuration
+    @ConditionalOnProperty(prefix = &quot;app.cache&quot;, name = &quot;provider&quot;, havingValue = &quot;local&quot;)
+    @EnableCaching
+    @EnableAutoConfiguration(exclude = { RedisAutoConfiguration.class })
+<span class="fc" id="L88">    static class LocalCacheConfig {</span>
+
+        @Bean
+        public CacheManager cacheManager() {
+<span class="fc" id="L92">            final SimpleCacheManager cacheManager = new SimpleCacheManager();</span>
+<span class="fc" id="L93">            final List&lt;Cache&gt; caches = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L94">            caches.add(new ConcurrentMapCache(CACHE_NAME));</span>
+<span class="fc" id="L95">            cacheManager.setCaches(caches);</span>
+<span class="fc" id="L96">            return cacheManager;</span>
+        }
+
+        @Bean
+        public ConcurrentMapCacheStatisticsProvider concurrentMapCacheStatisticsProvider() {
+<span class="fc" id="L101">            return new ConcurrentMapCacheStatisticsProvider();</span>
+        }
+
+    }
+
+    @Profile(&quot;aws&quot;)
+    @Configuration
+    @EnableContextCredentials(instanceProfile = true)
+    @EnableContextRegion(autoDetect = true)
+    @EnableContextInstanceData
+    @EnableElastiCache({ @CacheClusterConfig(name = CACHE_NAME) })
+<span class="nc" id="L112">    static class ElastiCacheConfig {</span>
+
+    }
+
+    @Configuration
+    @ConditionalOnProperty(prefix = &quot;app.cache&quot;, name = &quot;provider&quot;, havingValue = &quot;redis&quot;)
+    @EnableCaching
+    @EnableAutoConfiguration
+<span class="nc" id="L120">    static class SharedCacheConfig {</span>
+
+        @Bean
+        public RedisTemplate&lt;Object, Object&gt; redisTemplate(
+                RedisConnectionFactory redisConnectionFactory)
+                throws UnknownHostException {
+<span class="nc" id="L126">            RedisTemplate&lt;Object, Object&gt; template = new RedisTemplate&lt;Object, Object&gt;();</span>
+<span class="nc" id="L127">            template.setConnectionFactory(redisConnectionFactory);</span>
+<span class="nc" id="L128">            return template;</span>
+        }
+        
+        @Bean
+        public RedisCacheManager cacheManager(RedisTemplate&lt;Object, Object&gt; redisTemplate) {
+<span class="nc" id="L133">            RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);</span>
+<span class="nc" id="L134">            List&lt;String&gt; cacheNames = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L135">            cacheNames.add(CACHE_NAME);</span>
+<span class="nc" id="L136">            cacheManager.setCacheNames(cacheNames);</span>
+<span class="nc" id="L137">            return cacheManager;</span>
+        }
+
+        @Bean
+        public RedisMessageListenerContainer redisMessageListenerContainer(
+                RedisConnectionFactory redisConnectionFactory) {
+<span class="nc" id="L143">            RedisMessageListenerContainer container = new RedisMessageListenerContainer();</span>
+<span class="nc" id="L144">            container.setConnectionFactory(redisConnectionFactory);</span>
+<span class="nc" id="L145">            return container;</span>
+        }
+
+        @Bean
+        public RedisCacheStatisticsProvider redisCacheStatisticsProvider(RedisConnectionFactory factory) {
+<span class="nc" id="L150">            return new RedisCacheStatisticsProvider(factory);</span>
+        }
+    }
+
+    @Configuration
+    @ConditionalOnProperty(prefix = &quot;app.cache&quot;, name = &quot;provider&quot;, havingValue = &quot;redis&quot;)
+    @EnableScheduling
+<span class="nc" id="L157">    static class CacheMonitorConfig {</span>
+
+        @Bean
+        RedisCacheMonitor cacheMonitor(RedisConnectionFactory redisConnectionFactory,
+                DropwizardMetricServices metricServices) {
+<span class="nc" id="L162">            return new RedisCacheMonitor(redisConnectionFactory, metricServices);</span>
+        }
+    }
+
+    public static void main(String[] args) {
+<span class="nc" id="L167">		SpringApplication.run(Application.class, args);</span>
+<span class="nc" id="L168">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

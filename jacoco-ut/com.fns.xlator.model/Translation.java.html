@@ -5,9 +5,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.io.Serializable;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(value = { &quot;source&quot;, &quot;target&quot;, &quot;text&quot;, &quot;translation&quot; })
-public class Translation {
+public class Translation implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String source;
     private String target;
@@ -16,28 +20,28 @@ public class Translation {
 
     @JsonCreator
     public Translation(@JsonProperty(&quot;source&quot;) String source, @JsonProperty(&quot;target&quot;) String target,
-<span class="nc" id="L19">            @JsonProperty(&quot;text&quot;) String text, @JsonProperty(&quot;translation&quot;) String translation) {</span>
-<span class="nc" id="L20">        this.source = source;</span>
-<span class="nc" id="L21">        this.target = target;</span>
-<span class="nc" id="L22">        this.text = text;</span>
-<span class="nc" id="L23">        this.translation = translation;</span>
-<span class="nc" id="L24">    }</span>
+<span class="nc" id="L23">            @JsonProperty(&quot;text&quot;) String text, @JsonProperty(&quot;translation&quot;) String translation) {</span>
+<span class="nc" id="L24">        this.source = source;</span>
+<span class="nc" id="L25">        this.target = target;</span>
+<span class="nc" id="L26">        this.text = text;</span>
+<span class="nc" id="L27">        this.translation = translation;</span>
+<span class="nc" id="L28">    }</span>
 
 
     public String getSource() {
-<span class="nc" id="L28">        return source;</span>
+<span class="nc" id="L32">        return source;</span>
     }
 
     public String getTarget() {
-<span class="nc" id="L32">        return target;</span>
+<span class="nc" id="L36">        return target;</span>
     }
 
     public String getText() {
-<span class="nc" id="L36">        return text;</span>
+<span class="nc" id="L40">        return text;</span>
     }
 
     public String getTranslation() {
-<span class="nc" id="L40">        return translation;</span>
+<span class="nc" id="L44">        return translation;</span>
     }
 
 }
