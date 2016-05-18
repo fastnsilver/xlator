@@ -5,6 +5,8 @@
 # Update the configuration below to add your API key.  Be sure to update the app.defaults.service key to google if you wish to employ the Google Translate API instead.
 
 app:
+  cache:
+    provider: local
   #frengly:
     #email: 
     #password: 
@@ -19,27 +21,51 @@ app:
   limits:
     translationsPerRequest: 100
 
-cloud:
-  aws:
-    region:
-      static: us-east-1
-
+spring:
+  application:
+    name: @project.artifactId@
+  autoconfigure: 
+    exclude:
+      - org.springframework.boot.actuate.autoconfigure.CacheStatisticsAutoConfiguration
+      - org.springframework.cloud.aws.autoconfigure.cache.ElastiCacheAutoConfiguration
+      - org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration
+      - org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration
+     
+logging:
+  level:
+    - org.springframework.web: INFO
+    - com.fns.xlator: INFO
+    
 ---
 
 spring:
   profiles: docker
+  profiles.include: redis
+  redis:
+    host: redis
     
 monitoring:
   statsd:
     enabled: true
     hostname: graphite
-
+ 
 ---
 
 spring:
   profiles: aws
-    
+  profiles.include: redis
+  
 monitoring:
   statsd:
     enabled: true
     hostname: graphite
+    
+---
+
+spring:
+  profiles: redis
+  
+app:
+  cache:
+    provider: redis
+    

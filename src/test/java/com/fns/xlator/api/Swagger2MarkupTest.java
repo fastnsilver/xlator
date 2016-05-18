@@ -3,7 +3,7 @@ package com.fns.xlator.api;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fns.xlator.App;
+import com.fns.xlator.Application;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +22,7 @@ import springfox.documentation.staticdocs.Swagger2MarkupResultHandler;
 
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = App.class)
+@SpringApplicationConfiguration(classes = Application.class)
 public class Swagger2MarkupTest {
 
     @Autowired

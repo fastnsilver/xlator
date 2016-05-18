@@ -1,4 +1,4 @@
-package com.fns.xlator;
+package com.fns.xlator.controller;
 
 import com.fns.xlator.client.api.CacheService;
 import com.fns.xlator.client.api.TranslationService;

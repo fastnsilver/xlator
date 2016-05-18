@@ -1,5 +1,6 @@
 package com.fns.xlator.client.impl.frengly;
 
+import com.fns.xlator.Application;
 import com.fns.xlator.client.api.TranslationService;
 import com.fns.xlator.client.impl.TranslationException;
 import com.fns.xlator.client.impl.ValidationUtils;
@@ -10,11 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.web.client.RestClientException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 public class FrenglyTranslationService implements TranslationService {
 
@@ -54,22 +57,23 @@ public class FrenglyTranslationService implements TranslationService {
             try {
                 result = restTemplate.getForObject(uri, FrenglyTranslation.class);
                 break;
-            } catch (RestClientException e) {
+            } catch (final HttpClientErrorException e) {
+                if (e.getStatusCode() == HttpStatus.NOT_FOUND || e.getStatusCode() == HttpStatus.FORBIDDEN) {
+                    throw new TranslationException(source, target, text, e.getMessage());
+                }
                 try {
-                    Thread.sleep((i + 1) * 500);
-                } catch (InterruptedException ie) {
+                    // 0.5 ms multiplier delay for subsequent retries
+                    TimeUnit.MICROSECONDS.sleep((i + 1) * 500);
+                } catch (final InterruptedException ie) {
                     // do nothing
                 }
-            }
-            if (i == retries - 1) {
-                throw new TranslationException(source, target, text);
             }
         }
         return result;
     }
 
     @Override
-    @Cacheable(cacheNames = "translations")
+    @Cacheable(cacheNames = Application.CACHE_NAME)
     public Translation obtainTranslation(String src, String target, String text) {
         counterService.increment("services.frengly.translation.invoked");
         String source = src;
