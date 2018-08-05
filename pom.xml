@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.3.5.RELEASE</version>
+		<version>2.0.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
     
 	<groupId>com.fns.xlator</groupId>
 	<artifactId>xlator</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>0.5.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>xlator</name>
@@ -67,45 +67,50 @@
         <logstash-logback-encoder.version>2.5</logstash-logback-encoder.version>
                 
         <!-- Third-party library versions -->
-        <commons-lang3.version>3.4</commons-lang3.version>
-        <guava.version>19.0</guava.version>
-        <jackson.version>2.7.3</jackson.version>
+        <commons-lang3.version>3.7</commons-lang3.version>
+        <guava.version>25.1-jre</guava.version>
+        <jackson.version>2.9.6</jackson.version>
         <jedis.version>2.8.1</jedis.version>
         <jsr305.version>3.0.1</jsr305.version>
-        <readytalk-metrics.version>4.1.2</readytalk-metrics.version>
-        <rest-assured.version>2.9.0</rest-assured.version>
+        <micrometer.version>1.0.6</micrometer.version>
+        <micrometer-jvm-extras.version>0.1.2</micrometer-jvm-extras.version>
         <slf4j.version>1.7.21</slf4j.version>
-        <springfox.version>2.4.0</springfox.version>
-        <swagger2markup.version>0.9.2</swagger2markup.version>
+        <spring-auto-restdocs.version>2.0.1</spring-auto-restdocs.version>
         
         <!-- Maven -->
         <apiviz.version>1.3.2.GA</apiviz.version>
-        <asciidoctor-maven-plugin.version>1.5.3</asciidoctor-maven-plugin.version>
-        <docker-maven-plugin.version>0.4.3</docker-maven-plugin.version>
+        <asciidoctor-maven-plugin.version>1.5.6</asciidoctor-maven-plugin.version>
+        <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
         <downloads-maven-plugin.version>0.6</downloads-maven-plugin.version>
         <doxia-module-markdown.version>1.6</doxia-module-markdown.version>
-        <findbugs-maven-plugin.version>3.0.3</findbugs-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.7.6.201602180812</jacoco-maven-plugin.version>
-        <maven-changes-plugin.version>2.11</maven-changes-plugin.version>
+        <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.1</jacoco-maven-plugin.version>
+        <license-maven-plugin.version>1.16</license-maven-plugin.version>
+        <lombok-maven-plugin.version>1.18.2</lombok-maven-plugin.version>
+        <maven-changes-plugin.version>2.12.1</maven-changes-plugin.version>
         <maven-changelog-plugin.version>2.3</maven-changelog-plugin.version>
-        <maven-checkstyle-plugin.version>2.17</maven-checkstyle-plugin.version>
-        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
-        <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
+        <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
+        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+        <maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
+        <maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
         <maven-jxr-plugin.version>2.5</maven-jxr-plugin.version>
-        <maven-plugin-plugin.version>3.4</maven-plugin-plugin.version>
-        <maven-project-info-reports-plugin.version>2.9</maven-project-info-reports-plugin.version>
-        <maven-resources-plugin.version>2.7</maven-resources-plugin.version>
-        <maven-scm-provider-jgit.version>1.9.4</maven-scm-provider-jgit.version>
+        <maven-plugin-plugin.version>3.5.2</maven-plugin-plugin.version>
+        <maven-project-info-reports-plugin.version>2.7</maven-project-info-reports-plugin.version>
+        <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+        <maven-scm-provider-jgit.version>1.10.0</maven-scm-provider-jgit.version>
         <maven-site-plugin.version>3.4</maven-site-plugin.version>
-        <maven-scm-publish-plugin.version>1.1</maven-scm-publish-plugin.version>
-        <maven-surefire-report-plugin.version>2.19.1</maven-surefire-report-plugin.version>
+        <maven-scm-publish-plugin.version>3.0.0</maven-scm-publish-plugin.version>
+        <maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
+        <maven-surefire-report-plugin.version>2.22.0</maven-surefire-report-plugin.version>
         <plan-maven-plugin.version>1.2</plan-maven-plugin.version>
+        <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
         <reflow-velocity-tools.version>1.1.1</reflow-velocity-tools.version>
-        <sonar-maven-plugin.version>2.7.1</sonar-maven-plugin.version>
+        <sonar-maven-plugin.version>3.4.0.905</sonar-maven-plugin.version>
+        <spring-banner-plugin.version>1.0</spring-banner-plugin.version>
         <taglist-maven-plugin.version>2.4</taglist-maven-plugin.version>
         <velocity.version>1.7</velocity.version>
-        <versions-maven-plugin.version>2.2</versions-maven-plugin.version>
-        <wagon-webdav-jackrabbit.version>2.8</wagon-webdav-jackrabbit.version>
+        <versions-maven-plugin.version>2.5</versions-maven-plugin.version>
+        <wagon-webdav-jackrabbit.version>3.1.0</wagon-webdav-jackrabbit.version>
     </properties>
 
     <dependencyManagement>
@@ -113,14 +118,9 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Brixton.RELEASE</version>
+                <version>Finchley.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-ext</artifactId>
-                <version>${slf4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -133,40 +133,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jetty</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-jsp</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>websocket-server</artifactId>
-                    <groupId>org.eclipse.jetty.websocket</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>javax-websocket-server-impl</artifactId>
-                    <groupId>org.eclipse.jetty.websocket</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -188,7 +159,6 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>${commons-lang3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jolokia</groupId>
@@ -212,52 +182,32 @@
             <version>${guava.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.readytalk</groupId>
-            <artifactId>metrics3-statsd</artifactId>
-            <version>${readytalk-metrics.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-servlet</artifactId>
-            <version>${dropwizard-metrics.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-jvm</artifactId>
-            <version>${dropwizard-metrics.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.robwin</groupId>
-            <artifactId>swagger2markup</artifactId>
-            <version>${swagger2markup.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-staticdocs</artifactId>
-            <version>${springfox.version}</version>
+  			<groupId>io.micrometer</groupId>
+  			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<dependency>
+    		<groupId>io.github.mweirauch</groupId>
+    		<artifactId>micrometer-jvm-extras</artifactId>
+    		<version>${micrometer-jvm-extras.version}</version>
+		</dependency>
+		
+		<!-- Test dependencies -->
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+		<dependency>
+		    <groupId>org.springframework.restdocs</groupId>
+		    <artifactId>spring-restdocs-mockmvc</artifactId>
+		    <scope>test</scope>
+		</dependency>
         <dependency>
-            <groupId>com.jayway.restassured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>${rest-assured.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.restassured</groupId>
-            <artifactId>spring-mock-mvc</artifactId>
-            <version>${rest-assured.version}</version>
-            <scope>test</scope>
-        </dependency>
+		    <groupId>capital.scalable</groupId>
+			<artifactId>spring-auto-restdocs-core</artifactId>
+			<version>${spring-auto-restdocs.version}</version>
+			<scope>test</scope> 
+		</dependency>
     	</dependencies>
 	
     <repositories>
@@ -407,14 +357,14 @@
         </pluginManagement>
         
         <plugins>
-            <plugin>
+        	<plugin>
                  <groupId>org.asciidoctor</groupId>
                  <artifactId>asciidoctor-maven-plugin</artifactId>
                  <version>${asciidoctor-maven-plugin.version}</version>
                  <executions>
                      <execution>
                          <id>generate-docs</id>
-                         <phase>package</phase>
+                         <phase>prepare-package</phase>
                          <goals>
                              <goal>process-asciidoc</goal>
                          </goals>
@@ -432,8 +382,64 @@
                  </executions>
             </plugin>
             <plugin>
+            	<artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-index-public</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/public</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/generated-docs</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-index-generated-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.basedir}/generated-docs</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/generated-docs</directory>
+                                    <includes>
+                                        <include>index.html</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
+                <configuration>
+                	<failOnNoGitDirectory>false</failOnNoGitDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>validate-the-git-infos</id>
+                        <goals>
+                            <goal>validateRevision</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>tk.skuro</groupId>
@@ -463,6 +469,31 @@
                 </executions>
             </plugin>
             <plugin>
+	            <artifactId>maven-javadoc-plugin</artifactId>
+	            <extensions>true</extensions>
+	            <executions>
+	                <execution>
+	                    <id>generate-javadoc-json</id>
+	                    <phase>compile</phase>
+	                    <goals>
+	                        <goal>javadoc-no-fork</goal>
+	                    </goals>
+	                    <configuration>
+	                        <doclet>capital.scalable.restdocs.jsondoclet.ExtractDocumentationAsJsonDoclet</doclet>
+	                        <docletArtifact>
+	                            <groupId>capital.scalable</groupId>
+	                            <artifactId>spring-auto-restdocs-json-doclet</artifactId>
+	                            <version>${spring-auto-restdocs.version}</version>
+	                        </docletArtifact>
+	                        <destDir>generated-javadoc-json</destDir> 
+	                        <reportOutputDirectory>${project.build.directory}</reportOutputDirectory> 
+	                        <useStandardDocletOptions>false</useStandardDocletOptions>
+	                        <show>package</show>
+	                    </configuration>
+	                </execution>
+	            </executions>
+	        </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
@@ -474,6 +505,14 @@
                     <excludes>
                         <exclude>**/IT*.java</exclude>
                     </excludes>
+                    <systemPropertyVariables>
+	                    <org.springframework.restdocs.outputDir>
+	                        ${project.build.directory}/generated-snippets 
+	                    </org.springframework.restdocs.outputDir>
+	                    <org.springframework.restdocs.javadocJsonDir>
+	                        ${project.build.directory}/generated-javadoc-json 
+	                    </org.springframework.restdocs.javadocJsonDir>
+	                </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -500,6 +539,32 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>${license-maven-plugin.version}</version>
+                <configuration>
+                    <inceptionYear>2016</inceptionYear>
+                    <licenseName>apache_v2</licenseName>
+                    <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
+                    <canUpdateCopyright>true</canUpdateCopyright>
+                    <canUpdateDescription>true</canUpdateDescription>
+                    <canUpdateLicense>true</canUpdateLicense>
+                    <roots>
+                        <root>src/main/java</root>
+                        <root>src/test/java</root>
+                    </roots>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>update-header</id>
+                        <goals>
+                            <goal>update-file-header</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -933,77 +998,70 @@
             </activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>${docker-maven-plugin.version}</version>
-                        <configuration>
-                            <imageName>fastnsilver/${project.artifactId}</imageName>
-                            <dockerDirectory>${project.build.directory}/docker-ready</dockerDirectory>
-                            <resources>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${project.build.directory}</directory>
-                                    <include>${project.artifactId}-${project.version}.jar</include>
-                                </resource>
-                            </resources>
-                            <serverId>docker.io</serverId>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>build-docker-image</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>tag-docker-image</id>
-                                <phase>install</phase>
-                                <goals>
-                                    <goal>tag</goal>
-                                </goals>
-                                <configuration>
-                                    <image>fastnsilver/${project.artifactId}</image>
-                                    <newName>fastnsilver/${project.artifactId}:${project.version}</newName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>deploy-docker-image</id>
-                                <phase>deploy</phase>
-                                <goals>
-                                    <goal>tag</goal>
-                                </goals>
-                                <configuration>
-                                    <image>fastnsilver/${project.artifactId}:${project.version}</image>
-                                    <newName>docker.io/fastnsilver/${project.artifactId}:${project.version}</newName>
-                                    <pushImage>true</pushImage>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>${maven-resources-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <id>prepare-dockerfile</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/docker-ready</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/main/docker</directory>
-                                            <filtering>true</filtering>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
+        			<plugin>
+	 					<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<version>${docker-maven-plugin.version}</version>
+						<configuration>
+							<images>
+								<image>
+									<name>fastnsilver/%a:%l</name>
+									<build>
+										<dockerFileDir>${project.build.directory}/docker-ready</dockerFileDir>
+										<tags>${project.version}</tags>
+									</build>
+								</image>
+							</images>
+							<skipMachine>true</skipMachine>
+						</configuration>
+						<executions>
+   							<execution>
+   								<id>destroy-latest-docker-image</id>
+   								<phase>clean</phase>
+   								<goals>
+   									<goal>remove</goal>
+   								</goals>
+   								<configuration>
+   									<removeAll>true</removeAll>
+   								</configuration>
+   							</execution>
+   							<execution>
+   								<id>build-new-docker-image</id>
+   								<phase>install</phase>
+   								<goals>
+   									<goal>build</goal>
+   								</goals>
+   							</execution>
+   						</executions>
+					</plugin>
+					<plugin>
+					    <artifactId>maven-resources-plugin</artifactId>
+					    <version>${maven-resources-plugin.version}</version>
+					    <executions>
+					        <execution>
+					            <id>prepare-for-docker-build</id>
+					            <phase>verify</phase>
+					            <goals>
+					                <goal>copy-resources</goal>
+					            </goals>
+					            <configuration>
+					                <outputDirectory>${project.build.directory}/docker-ready</outputDirectory>
+					                <resources>
+					                    <resource>
+					                        <directory>src/main/docker</directory>
+					                        <filtering>true</filtering>
+					                    </resource>
+					                    <resource>
+					                        <directory>${project.build.directory}</directory>
+					                        <includes>
+					                            <include>${project.artifactId}-${project.version}.jar</include>
+					                        </includes>
+					                    </resource>
+					                </resources>
+					            </configuration>
+					        </execution>
+					    </executions>
+					</plugin>
                 </plugins>
             </build>
         </profile>

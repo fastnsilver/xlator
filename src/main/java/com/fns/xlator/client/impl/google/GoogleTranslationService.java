@@ -1,23 +1,41 @@
+/*-
+ * #%L
+ * xlator
+ * %%
+ * Copyright (C) 2016 - 2018 FNS
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 package com.fns.xlator.client.impl.google;
 
-import com.fns.xlator.Application;
-import com.fns.xlator.client.api.TranslationService;
-import com.fns.xlator.client.impl.TranslationException;
-import com.fns.xlator.client.impl.ValidationUtils;
-import com.fns.xlator.model.Translation;
+import java.net.URI;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-import java.util.concurrent.TimeUnit;
+import com.fns.xlator.client.api.TranslationService;
+import com.fns.xlator.client.config.AppConfig;
+import com.fns.xlator.client.impl.TranslationException;
+import com.fns.xlator.client.impl.ValidationUtils;
+import com.fns.xlator.model.Translation;
 
 public class GoogleTranslationService implements TranslationService {
 
@@ -25,14 +43,11 @@ public class GoogleTranslationService implements TranslationService {
 
     private RestTemplate restTemplate;
     private GoogleClientSettings settings;
-    private CounterService counterService;
 
     @Autowired
-    public GoogleTranslationService(RestTemplate restTemplate, GoogleClientSettings settings,
-            CounterService counterService) {
+    public GoogleTranslationService(RestTemplate restTemplate, GoogleClientSettings settings) {
         this.restTemplate = restTemplate;
         this.settings = settings;
-        this.counterService = counterService;
     }
 
     // @see https://cloud.google.com/translate/v2/using_rest#Translate
@@ -71,9 +86,8 @@ public class GoogleTranslationService implements TranslationService {
     }
 
     @Override
-    @Cacheable(cacheNames = Application.CACHE_NAME)
+    @Cacheable(cacheNames = AppConfig.CACHE_NAME)
     public Translation obtainTranslation(String src, String target, String text) {
-        counterService.increment("services.google.translation.invoked");
         String source = src;
         if (source == null) {
             source = settings.getDefaultSource();

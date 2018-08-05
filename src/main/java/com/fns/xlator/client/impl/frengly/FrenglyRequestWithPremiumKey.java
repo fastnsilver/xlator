@@ -21,25 +21,37 @@ package com.fns.xlator.client.impl.frengly;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonInclude(content = Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonPropertyOrder(value = { "src", "dest", "text", "translation" })
-public class FrenglyTranslation {
+@JsonPropertyOrder(value = { "src", "dest", "text", "email", "password", "premiumKey" })
+public class FrenglyRequestWithPremiumKey {
 
     private String src;
     private String dest;
     private String text;
-    private String translation;
+    private String email;
+    private String password;
+    private String premiumKey;
 
     @JsonCreator
-    public FrenglyTranslation(@JsonProperty("src") String src, @JsonProperty("dest") String dest,
-            @JsonProperty("text") String text, @JsonProperty("translation") String translation) {
+    public FrenglyRequestWithPremiumKey(
+    		@JsonProperty("src") String src, 
+    		@JsonProperty("dest") String dest,
+            @JsonProperty("text") String text, 
+            @JsonProperty("email") String email,
+            @JsonProperty("password") String password,
+            @JsonProperty("premiumKey") String premiumKey) {
         this.src = src;
         this.dest = dest;
         this.text = text;
-        this.translation = translation;
+        this.email = email;
+        this.password = password;
+        this.premiumKey = premiumKey;
     }
 
 
@@ -55,8 +67,15 @@ public class FrenglyTranslation {
         return text;
     }
 
-    public String getTranslation() {
-        return translation;
+    public String getEmail() {
+        return email;
+    }
+    
+    public String getPassword() {
+    	return password;
     }
 
+    public String getPremiumKey() {
+    	return premiumKey;
+    }
 }

@@ -1,16 +1,24 @@
-FROM delitescere/jdk:8
+FROM openjdk:8-jdk-alpine
 
-MAINTAINER Chris Phillipson <fastnsilver@gmail.com>
+RUN apk add --no-cache curl tar bash procps
 
-ENV MAVEN_VERSION="3.3.9" \
-    M2_HOME=/usr/lib/mvn
+ARG MAVEN_VERSION=3.5.4
+ARG USER_HOME_DIR="/root"
+ARG SHA=ce50b1c91364cb77efe3776f756a6d92b76d9038b0a0782f7d53acf1e997a14d
+ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
-RUN apk add --update wget && \
-  mkdir -p /tmp && \
-  cd /tmp && \
-  wget "http://ftp.unicamp.br/pub/apache/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz" && \
-  tar -zxvf "apache-maven-$MAVEN_VERSION-bin.tar.gz" && \
-  mv "apache-maven-$MAVEN_VERSION" "$M2_HOME" && \
-  ln -s "$M2_HOME/bin/mvn" /usr/bin/mvn && \
-  apk del wget && \
-  rm /tmp/* /var/cache/apk/*
+RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
+  && curl -fsSL -o /tmp/apache-maven.tar.gz ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
+  && echo "${SHA}  /tmp/apache-maven.tar.gz" | sha256sum -c - \
+  && tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 \
+  && rm -f /tmp/apache-maven.tar.gz \
+  && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
+ENV MAVEN_HOME /usr/share/maven
+ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
+
+COPY mvn-entrypoint.sh /usr/local/bin/mvn-entrypoint.sh
+COPY settings-docker.xml /usr/share/maven/ref/
+
+ENTRYPOINT ["/usr/local/bin/mvn-entrypoint.sh"]
+CMD ["mvn"]

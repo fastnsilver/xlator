@@ -6,6 +6,3 @@ ____  ___.__          __
       \_/          \/                   
                                          
  Version:  @project.version@ 
- CommitId: @git.commit.id@
- 
- 
