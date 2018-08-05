@@ -66,8 +66,8 @@ It is initialized with: [Application.java](https://github.com/fastnsilver/xlator
 
 ### Prerequisites
 
-* Java [JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 1.8.0_45 or better
-* [Maven](https://maven.apache.org/download.cgi) 3.3.3 or better
+* Java [JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 1.8.0_181 or better
+* [Maven](https://maven.apache.org/download.cgi) 3.5.4 or better
 
 
 ### How to build
@@ -107,49 +107,26 @@ where `x.x.x` is a version like `0.0.1-SNAPSHOT`
 
 #### with Docker
 
-Assuming you have installed VirtualBox, Docker Machine, Docker Compose and Docker.
-
-If not, it's highly recommended (on a Mac) to install each via [Homebrew](http://brew.sh/) with
-
-```
-brew tap caskroom/cask
-brew install brew-cask
-brew cask install virtualbox
-
-brew install docker-machine
-brew install docker-compose
-brew install docker
-```
-
-The instruction below provisions a Docker host named `dev` with 2 CPU, 10Gb RAM and 40Gb disk space
-
-```
-docker-machine create --driver virtualbox --virtualbox-cpu-count "2" --virtualbox-disk-size "40000" --virtualbox-memory "10240" dev
-```
-
-To begin using it
-
-```
-docker-machine env dev
-```
+Go get Docker for [Windows](https://www.docker.com/docker-windows), [Mac](https://www.docker.com/docker-mac), or [Ubuntu](https://www.docker.com/docker-ubuntu)
 
 
 ##### Build images
 
 ```
+touch .dockerize
 mvn clean install
 ```
 
 
 ##### Publish images
 
-Assumes proper authentication credentials have been added to `$HOME/.m2/settings.xml`. See:
-
-* [Authenticating with Private Registries](https://github.com/spotify/docker-maven-plugin#authenticating-with-private-registries)
+Consult the [Authentication](http://dmp.fabric8.io/#pull-vs-push-authentication) section of the [docker-maven-plugin](https://github.com/fabric8io/docker-maven-plugin) documentation for alternative options.
 
 ```
-mvn clean install -DpushImage
+mvn docker:push -Ddocker.username={registry_username} -Ddocker.password={registry_password}
 ```
+
+> Replace `{registry_username}` and `{registry_password }` above with credentials to a registry like [Docker hub](https://hub.docker.com).  If you intend to use an alternate registry you'll expend a bit more effort to configure.
 
 
 ##### Pull images
@@ -165,16 +142,8 @@ You will have to set some environment variables in [xlator.env](https://github.c
 
 ```
 cd deploy/docker
-***REMOVED***
+./startup.sh
 ```
-
-###### Running a local development environment
-
-@see https://forums.docker.com/t/using-localhost-for-to-access-running-container/3148
-
-On a Mac we cannot access running Docker containers from localhost.
-
-After running `docker-machine ip {env}` where `{env}` is your instance of a docker-machine, add an entry in `/etc/hosts` that maps `DOCKER_HOST` IP address to a memorable hostname.
 
 
 ##### Work with images
@@ -184,21 +153,25 @@ Services are accessible via the Docker host (or IP address) and port
 Service           |  Port
 ------------------|-------
 Xlator            | 80
-Graphite          | 8000
+Prometheus        | 9090
 Grafana           | 3000
 CAdvisor          | 9080
 Redis             | 6379
+
+> Consider importing a couple of dashboards into Grafana, like [jvm](http://micrometer.io/docs/registry/prometheus#_grafana_dashboard) and [throughput](https://grafana.com/dashboards/5373)
 
 
 ##### Stop images (and remove them)
 
 ```
-docker-compose stop
+./shutdown.sh
 docker-compose rm -f
 ```
 
 
 ### Working with Maven Site 
+
+> Note: as of 2018-08-05, this Maven Site is only known to generate successfully employing JDK 8u181. 
 
 #### Stage
 
@@ -230,3 +203,10 @@ mvn scm-publish:publish-scm -Pdocumentation
 
 2) Deploy service to AWS
 
+
+## Credits
+
+Major props go out to
+
+* [Jon Schneider](https://www.youtube.com/watch?reload=9&v=LkWVFz9WGeU)
+* [Byteville](http://www.bytesville.com/springboot-micrometer-prometheus-grafana/)

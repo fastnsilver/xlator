@@ -36,6 +36,22 @@ logging:
     - org.springframework.web: INFO
     - com.fns.xlator: INFO
     
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health,metrics,httptrace,prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+      sla:
+        http:
+          server:
+            requests: 50ms 
+ 
 ---
 
 spring:
@@ -43,23 +59,13 @@ spring:
   profiles.include: redis
   redis:
     host: redis
-    
-monitoring:
-  statsd:
-    enabled: true
-    hostname: graphite
- 
+        
 ---
 
 spring:
   profiles: aws
   profiles.include: redis
-  
-monitoring:
-  statsd:
-    enabled: true
-    hostname: graphite
-    
+          
 ---
 
 spring:
