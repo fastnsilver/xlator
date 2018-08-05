@@ -1,4 +1,44 @@
+/*-
+ * #%L
+ * xlator
+ * %%
+ * Copyright (C) 2016 - 2018 FNS
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 package com.fns.xlator.controller;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fns.xlator.client.api.CacheService;
 import com.fns.xlator.client.api.TranslationService;
@@ -8,33 +48,11 @@ import com.fns.xlator.model.Translation;
 import com.fns.xlator.model.TranslationRequest;
 import com.fns.xlator.model.Translations;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import io.micrometer.core.annotation.Timed;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/translation")
-@Api(value = "translation", produces = "application/json")
 public class TranslationController {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -92,77 +110,48 @@ public class TranslationController {
         return ResponseEntity.ok(result);
     }
 
-
-    @RequestMapping(value = "/source/{src}/target/{target}/text/{text}", method = RequestMethod.GET)
-    @ApiOperation(httpMethod = "GET", notes = "Obtain a translation.", value = "/translation/source/{src}/target/{target}/text/{text}")
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Successfully obtained translation."),
-            @ApiResponse(code = 400, message = "Bad request."),
-            @ApiResponse(code = 500, message = "Internal server error.") 
-    })
+    
+    @Timed
+    @GetMapping(value = "/source/{src}/target/{target}/text/{text}")
     public ResponseEntity<Translation> obtainTranslation(@PathVariable("src") String source,
             @PathVariable("target") String target, @PathVariable("text") String text) {
         return ResponseEntity.ok(translationService.obtainTranslation(source, target, text));
     }
 
+    @Timed
     // convenience, uses a configurable default locale
-    @RequestMapping(value = "/target/{target}/text/{text}", method = RequestMethod.GET)
-    @ApiOperation(httpMethod = "GET", notes = "Obtain a translation using default locale.", value = "/translation/target/{target}/text/{text}")
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Successfully obtained translation."),
-            @ApiResponse(code = 400, message = "Bad request."),
-            @ApiResponse(code = 500, message = "Internal server error.") 
-    })
+    @GetMapping(value = "/target/{target}/text/{text}")
     public ResponseEntity<Translation> obtainTranslation(@PathVariable("target") String target,
             @PathVariable("text") String text) {
         return ResponseEntity.ok(translationService.obtainTranslation(defaultLocale, target, text));
     }
 
+    @Timed
     // convenience, source x n target combinations for a text
-    @RequestMapping(value = "/source/{src}/targets/{targets}/text/{text}", method = RequestMethod.GET)
-    @ApiOperation(httpMethod = "GET", notes = "Obtain translations for each target locale.", value = "/translation/source/{src}/targets/{targets}/text/{text}")
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Obtained translations.  (Report errors with any target)."),
-            @ApiResponse(code = 400, message = "Bad request."),
-            @ApiResponse(code = 500, message = "Internal server error.") 
-    })
+    @GetMapping(value = "/source/{src}/targets/{targets}/text/{text}")
     public ResponseEntity<Translations> obtainTranslations(@PathVariable("src") String source,
             @PathVariable("targets") String targets, @PathVariable("text") String text, HttpServletRequest request) {
         return fetchTranslations(source, targets, text, request);
     }
 
+    @Timed
     // convenience, default configurable locale x n target combinations for a text
-    @RequestMapping(value = "/targets/{targets}/text/{text}", method = RequestMethod.GET)
-    @ApiOperation(httpMethod = "GET", notes = "Obtain translations for each target locale using default locale.", value = "/translation/targets/{targets}/text/{text}")
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Obtained translations.  (Report errors with any target)."),
-            @ApiResponse(code = 400, message = "Bad request."),
-            @ApiResponse(code = 500, message = "Internal server error.") 
-    })
+    @GetMapping(value = "/targets/{targets}/text/{text}")
     public ResponseEntity<Translations> obtainTranslations(@PathVariable("targets") String targets,
             @PathVariable("text") String text, HttpServletRequest request) {
         return fetchTranslations(defaultLocale, targets, text, request);
     }
 
+    @Timed
     // most flexible option
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    @ApiOperation(httpMethod = "POST", notes = "Obtain translations.", value = "/translation/")
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Obtained translations.  (Report errors with any source-target-text combination)."),
-            @ApiResponse(code = 400, message = "Bad request."),
-            @ApiResponse(code = 500, message = "Internal server error.") 
-    })
+    @PostMapping(value = "/")
     public ResponseEntity<Translations> obtainTranslations(@RequestBody TranslationRequest[] translationRequests,
             HttpServletRequest request) {
         return fetchTranslations(translationRequests, request);
     }
 
-    @RequestMapping(value = "/source/{src}/target/{target}/text/{text}", method = RequestMethod.DELETE)
-    @ApiOperation(httpMethod = "DELETE", notes = "Evict cache-key for a previously obtained translation.", value = "/translation/source/{src}/target/{target}/text/{text}")
-    @ApiResponses(value = { 
-            @ApiResponse(code = 204, message = "Successfully evicted key."),
-            @ApiResponse(code = 500, message = "Internal server error.") 
-    })
+    @Timed
+    @DeleteMapping(value = "/source/{src}/target/{target}/text/{text}")
     public ResponseEntity<?> invalidateCacheKey(@PathVariable("src") String source,
             @PathVariable("target") String target, @PathVariable("text") String text) {
         cacheService.evictTranslation(source, target, text);

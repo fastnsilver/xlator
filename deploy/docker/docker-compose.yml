@@ -1,31 +1,29 @@
 # DOCKER COMPOSE CONFIGURATION
-# This file uses the version 2 docker-compose file format, described here:
-# https://docs.docker.com/compose/compose-file/#version-2
+# This file uses the version 3 docker-compose file format, described here:
+# https://docs.docker.com/compose/compose-file/#version-3
 
-version: '2'
+version: '3'
 
 services:
   ## INFRASTRUCTURE SERVICES
   
-  ### GRAPHITE, STATSD
-  graphite:
-    image: hopsoft/graphite-statsd
+  ### PROMETHEUS
+  prometheus:
+    image: prom/prometheus
     ports:
-      - 8000:80
-      - 2003:2003
-      - 8125:8125
-      - 8125:8125/udp
-      - 8126:8126
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
   ### GRAFANA
   grafana:
     image: grafana/grafana
     ports:
       - 3000:3000
-    links:
-      - graphite
-    env_file:
-      - ./grafana.env
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
     
   ### CADVISOR
   cadvisor:
@@ -53,7 +51,23 @@ services:
     image: fastnsilver/xlator
     ports:
       - 80:8080
-    links:
-      - graphite
-    env_file:
-      - ./xlator.env
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE}
+      # Pick an ISO 639-1 code for locale (e.g., en for English)
+      - APP_DEFAULTS_LOCALE=${APP_DEFAULTS_LOCALE}
+      # Default service choices are: frengly, google
+      - APP_DEFAULTS_SERVICE=${APP_DEFAULTS_SERVICE}
+      # Choose a number <= 100
+      - APP_LIMITS_TRANSLATIONS_PER_REQUEST=${APP_LIMITS_TRANSLATIONS_PER_REQUEST}
+      # OPTION 1: FRENGLY
+      # Be sure to register for an account on http://frengly.com before attempting to use this service!
+      # You should update the configuration below, adding email and password values matching a valid pair of credentials.
+      - APP_FRENGLY_EMAIL=${APP_FRENGLY_EMAIL}
+      - APP_FRENGLY_PASSWORD=${APP_FRENGLY_PASSWORD}
+      # OPTION 2: GOOGLE TRANSLATE
+      # Another pay-for option is the Google Translate API (@see https://cloud.google.com/translate/v2/using_rest).
+      # Update (and uncomment) the configuration below to add your API key.  
+      # Be sure to comment out the lines that start with APP_FRENGLY above if you wish to employ the Google Translate API instead.
+      - APP_GOOGLE_KEY=${APP_GOOGLE_KEY}
+
