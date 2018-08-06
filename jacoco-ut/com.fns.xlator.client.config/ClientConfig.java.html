@@ -1,57 +1,121 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ClientConfig.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xlator</a> &gt; <a href="index.source.html" class="el_package">com.fns.xlator.client.config</a> &gt; <span class="el_source">ClientConfig.java</span></div><h1>ClientConfig.java</h1><pre class="source lang-java linenums">package com.fns.xlator.client.config;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClientConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xlator</a> &gt; <a href="index.source.html" class="el_package">com.fns.xlator.client.config</a> &gt; <span class="el_source">ClientConfig.java</span></div><h1>ClientConfig.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * xlator
+ * %%
+ * Copyright (C) 2016 - 2018 FNS
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+package com.fns.xlator.client.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
 @Configuration
-<span class="fc" id="L21">public class ClientConfig {</span>
+<span class="fc" id="L41">public class ClientConfig {</span>
 
+	static class FrenglyConverter extends AbstractJackson2HttpMessageConverter {
+
+		@org.springframework.lang.Nullable
+		private String jsonPrefix;
+
+		public FrenglyConverter() {
+<span class="fc" id="L49">			super(Jackson2ObjectMapperBuilder.json().build(), new MediaType(&quot;text&quot;, &quot;json&quot;, Charset.defaultCharset()));</span>
+<span class="fc" id="L50">		}</span>
+
+		public void setJsonPrefix(String jsonPrefix) {
+<span class="nc" id="L53">			this.jsonPrefix = jsonPrefix;</span>
+<span class="nc" id="L54">		}</span>
+
+		public void setPrefixJson(boolean prefixJson) {
+<span class="nc bnc" id="L57" title="All 2 branches missed.">			this.jsonPrefix = (prefixJson ? &quot;)]}', &quot; : null);</span>
+<span class="nc" id="L58">		}</span>
+
+		@Override
+		@SuppressWarnings(&quot;deprecation&quot;)
+		protected void writePrefix(com.fasterxml.jackson.core.JsonGenerator generator, Object object) throws IOException {
+<span class="nc bnc" id="L63" title="All 2 branches missed.">			if (this.jsonPrefix != null) {</span>
+<span class="nc" id="L64">				generator.writeRaw(this.jsonPrefix);</span>
+			}
+<span class="nc bnc" id="L66" title="All 2 branches missed.">			String jsonpFunction =</span>
+<span class="nc" id="L67">					(object instanceof MappingJacksonValue ? ((MappingJacksonValue) object).getJsonpFunction() : null);</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">			if (jsonpFunction != null) {</span>
+<span class="nc" id="L69">				generator.writeRaw(&quot;/**/&quot;);</span>
+<span class="nc" id="L70">				generator.writeRaw(jsonpFunction + &quot;(&quot;);</span>
+			}
+<span class="nc" id="L72">		}</span>
+
+		@Override
+		@SuppressWarnings(&quot;deprecation&quot;)
+		protected void writeSuffix(com.fasterxml.jackson.core.JsonGenerator generator, Object object) throws IOException {
+<span class="nc bnc" id="L77" title="All 2 branches missed.">			String jsonpFunction =</span>
+<span class="nc" id="L78">					(object instanceof MappingJacksonValue ? ((MappingJacksonValue) object).getJsonpFunction() : null);</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">			if (jsonpFunction != null) {</span>
+<span class="nc" id="L80">				generator.writeRaw(&quot;);&quot;);</span>
+			}
+<span class="nc" id="L82">		}</span>
+	}
+	
+	@Bean
+    RestTemplate restTemplate(
+    		ClientHttpRequestFactory clientHttpRequestFactory,
+    		RestTemplateBuilder restTemplateBuilder) {
+<span class="fc" id="L89">    	return restTemplateBuilder</span>
+<span class="fc" id="L90">    		.detectRequestFactory(true)</span>
+<span class="fc" id="L91">    		.build();</span>
+    }
+	
+<span class="fc" id="L94">	static class CustomRestTemplateCustomizer implements RestTemplateCustomizer {</span>
+	    @Override
+	    public void customize(RestTemplate restTemplate) {
+<span class="fc" id="L97">	        restTemplate.getMessageConverters().add(new FrenglyConverter());</span>
+<span class="fc" id="L98">	    }</span>
+	}
+	
     @Bean
-    RestTemplate restTemplate() {
-<span class="fc" id="L25">        RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());</span>
-<span class="fc" id="L26">        List&lt;HttpMessageConverter&lt;?&gt;&gt; converters = restTemplate.getMessageConverters();</span>
-<span class="fc bfc" id="L27" title="All 2 branches covered.">        for (HttpMessageConverter&lt;?&gt; converter : converters) {</span>
-<span class="fc bfc" id="L28" title="All 2 branches covered.">            if (converter instanceof MappingJackson2HttpMessageConverter) {</span>
-<span class="fc" id="L29">                MappingJackson2HttpMessageConverter jsonConverter = (MappingJackson2HttpMessageConverter) converter;</span>
-<span class="fc" id="L30">                jsonConverter.setObjectMapper(new ObjectMapper());</span>
-                // unfortunately we have to make converter aware of other media types
-                // since some legacy services respond with text/json
-<span class="fc" id="L33">                List&lt;MediaType&gt; supportedMediaTypes = ImmutableList.of(</span>
-                        new MediaType(&quot;application&quot;, &quot;json&quot;, MappingJackson2HttpMessageConverter.DEFAULT_CHARSET),
-                        new MediaType(&quot;text&quot;, &quot;json&quot;, MappingJackson2HttpMessageConverter.DEFAULT_CHARSET),
-                        new MediaType(&quot;text&quot;, &quot;javascript&quot;, MappingJackson2HttpMessageConverter.DEFAULT_CHARSET));
-<span class="fc" id="L37">                jsonConverter.setSupportedMediaTypes(supportedMediaTypes);</span>
-            }
-<span class="fc" id="L39">        }</span>
-<span class="fc" id="L40">        return restTemplate;</span>
+    CustomRestTemplateCustomizer customRestTemplateCustomizer() {
+<span class="fc" id="L103">    	return new CustomRestTemplateCustomizer();</span>
     }
     
-    private ClientHttpRequestFactory getClientHttpRequestFactory() {
-<span class="fc" id="L44">        int timeout = 5000;</span>
+    @Bean
+    ClientHttpRequestFactory clientHttpRequestFactory() {
+<span class="fc" id="L108">        int timeout = 10000;</span>
         RequestConfig config = 
-<span class="fc" id="L46">          RequestConfig.custom()</span>
-<span class="fc" id="L47">                       .setConnectTimeout(timeout)</span>
-<span class="fc" id="L48">                       .setConnectionRequestTimeout(timeout)</span>
-<span class="fc" id="L49">                       .setSocketTimeout(timeout)</span>
-<span class="fc" id="L50">                       .build();</span>
+<span class="fc" id="L110">          RequestConfig.custom()</span>
+<span class="fc" id="L111">                       .setConnectTimeout(timeout)</span>
+<span class="fc" id="L112">                       .setConnectionRequestTimeout(timeout)</span>
+<span class="fc" id="L113">                       .setSocketTimeout(timeout)</span>
+<span class="fc" id="L114">                       .build();</span>
         CloseableHttpClient client = 
-<span class="fc" id="L52">                HttpClientBuilder.create().setDefaultRequestConfig(config).build();</span>
-<span class="fc" id="L53">        return new HttpComponentsClientHttpRequestFactory(client);</span>
+<span class="fc" id="L116">                HttpClientBuilder.create().setDefaultRequestConfig(config).build();</span>
+<span class="fc" id="L117">        return new HttpComponentsClientHttpRequestFactory(client);</span>
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

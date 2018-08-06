@@ -1,4 +1,44 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>TranslationController.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xlator</a> &gt; <a href="index.source.html" class="el_package">com.fns.xlator.controller</a> &gt; <span class="el_source">TranslationController.java</span></div><h1>TranslationController.java</h1><pre class="source lang-java linenums">package com.fns.xlator.controller;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TranslationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xlator</a> &gt; <a href="index.source.html" class="el_package">com.fns.xlator.controller</a> &gt; <span class="el_source">TranslationController.java</span></div><h1>TranslationController.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * xlator
+ * %%
+ * Copyright (C) 2016 - 2018 FNS
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+package com.fns.xlator.controller;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.fns.xlator.client.api.CacheService;
 import com.fns.xlator.client.api.TranslationService;
@@ -8,36 +48,14 @@ import com.fns.xlator.model.Translation;
 import com.fns.xlator.model.TranslationRequest;
 import com.fns.xlator.model.Translations;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import io.micrometer.core.annotation.Timed;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping(&quot;/translation&quot;)
-@Api(value = &quot;translation&quot;, produces = &quot;application/json&quot;)
 public class TranslationController {
 
-<span class="fc" id="L40">    private final Logger log = LoggerFactory.getLogger(getClass());</span>
+<span class="fc" id="L58">    private final Logger log = LoggerFactory.getLogger(getClass());</span>
 
     private CacheService cacheService;
     private TranslationService translationService;
@@ -47,137 +65,108 @@ public class TranslationController {
     @Autowired
     public TranslationController(CacheService cacheService, TranslationService translationService,
             @Value(&quot;${app.defaults.locale}&quot;) String defaultLocale,
-<span class="fc" id="L50">            @Value(&quot;${app.limits.translationsPerRequest}&quot;) int maximumTranslations) {</span>
-<span class="fc" id="L51">        this.cacheService = cacheService;</span>
-<span class="fc" id="L52">        this.translationService = translationService;</span>
-<span class="fc" id="L53">        this.defaultLocale = defaultLocale;</span>
-<span class="fc" id="L54">        this.maximumTranslations = maximumTranslations;</span>
-<span class="fc" id="L55">    }</span>
+<span class="fc" id="L68">            @Value(&quot;${app.limits.translationsPerRequest}&quot;) int maximumTranslations) {</span>
+<span class="fc" id="L69">        this.cacheService = cacheService;</span>
+<span class="fc" id="L70">        this.translationService = translationService;</span>
+<span class="fc" id="L71">        this.defaultLocale = defaultLocale;</span>
+<span class="fc" id="L72">        this.maximumTranslations = maximumTranslations;</span>
+<span class="fc" id="L73">    }</span>
 
     
     protected ResponseEntity&lt;Translations&gt; fetchTranslations(TranslationRequest[] translationRequests,
             HttpServletRequest request) {
-<span class="nc" id="L60">        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L61">        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L62" title="All 2 branches missed.">        Assert.isTrue(translationRequests.length &lt;= maximumTranslations, String.format(</span>
-<span class="nc" id="L63">                &quot;[Assertion failed] - No more than %d translations may be requested at once!&quot;, maximumTranslations));</span>
-<span class="nc bnc" id="L64" title="All 2 branches missed.">        for (TranslationRequest tr : translationRequests) {</span>
+<span class="nc" id="L78">        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L79">        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        Assert.isTrue(translationRequests.length &lt;= maximumTranslations, String.format(</span>
+<span class="nc" id="L81">                &quot;[Assertion failed] - No more than %d translations may be requested at once!&quot;, maximumTranslations));</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        for (TranslationRequest tr : translationRequests) {</span>
             try {
-<span class="nc" id="L66">                translations.add(translationService.obtainTranslation(tr.getSource(), tr.getTarget(), tr.getText()));</span>
-<span class="nc" id="L67">            } catch (IllegalArgumentException | TranslationException e) {</span>
-<span class="nc" id="L68">                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),</span>
-<span class="nc" id="L69">                        e.getMessage()));</span>
-<span class="nc" id="L70">            }</span>
+<span class="nc" id="L84">                translations.add(translationService.obtainTranslation(tr.getSource(), tr.getTarget(), tr.getText()));</span>
+<span class="nc" id="L85">            } catch (IllegalArgumentException | TranslationException e) {</span>
+<span class="nc" id="L86">                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),</span>
+<span class="nc" id="L87">                        e.getMessage()));</span>
+<span class="nc" id="L88">            }</span>
         }
-<span class="nc" id="L72">        Translations result = new Translations(translations, errors);</span>
-<span class="nc" id="L73">        return ResponseEntity.ok(result);</span>
+<span class="nc" id="L90">        Translations result = new Translations(translations, errors);</span>
+<span class="nc" id="L91">        return ResponseEntity.ok(result);</span>
     }
 
     protected ResponseEntity&lt;Translations&gt; fetchTranslations(String source, String targets, String text,
             HttpServletRequest request) {
-<span class="nc" id="L78">        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L79">        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L80">        List&lt;String&gt; t = Arrays.asList(targets.split(&quot;\\s*,\\s*&quot;));</span>
-<span class="nc bnc" id="L81" title="All 2 branches missed.">        Assert.isTrue(t.size() &lt;= maximumTranslations, String.format(</span>
-<span class="nc" id="L82">                &quot;[Assertion failed] - No more than %d translations may be requested at once!&quot;, maximumTranslations));</span>
-<span class="nc bnc" id="L83" title="All 2 branches missed.">        for (String target : t) {</span>
+<span class="nc" id="L96">        List&lt;Translation&gt; translations = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L97">        List&lt;ErrorResponse&gt; errors = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L98">        List&lt;String&gt; t = Arrays.asList(targets.split(&quot;\\s*,\\s*&quot;));</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        Assert.isTrue(t.size() &lt;= maximumTranslations, String.format(</span>
+<span class="nc" id="L100">                &quot;[Assertion failed] - No more than %d translations may be requested at once!&quot;, maximumTranslations));</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        for (String target : t) {</span>
             try {
-<span class="nc" id="L85">                translations.add(translationService.obtainTranslation(source, target, text));</span>
-<span class="nc" id="L86">            } catch (IllegalArgumentException | TranslationException e) {</span>
-<span class="nc" id="L87">                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),</span>
-<span class="nc" id="L88">                        e.getMessage()));</span>
-<span class="nc" id="L89">            }</span>
-<span class="nc" id="L90">        }</span>
-<span class="nc" id="L91">        Translations result = new Translations(translations, errors);</span>
-<span class="nc" id="L92">        return ResponseEntity.ok(result);</span>
+<span class="nc" id="L103">                translations.add(translationService.obtainTranslation(source, target, text));</span>
+<span class="nc" id="L104">            } catch (IllegalArgumentException | TranslationException e) {</span>
+<span class="nc" id="L105">                errors.add(new ErrorResponse(request.getMethod(), request.getRequestURI(), request.getQueryString(),</span>
+<span class="nc" id="L106">                        e.getMessage()));</span>
+<span class="nc" id="L107">            }</span>
+<span class="nc" id="L108">        }</span>
+<span class="nc" id="L109">        Translations result = new Translations(translations, errors);</span>
+<span class="nc" id="L110">        return ResponseEntity.ok(result);</span>
     }
 
-
-    @RequestMapping(value = &quot;/source/{src}/target/{target}/text/{text}&quot;, method = RequestMethod.GET)
-    @ApiOperation(httpMethod = &quot;GET&quot;, notes = &quot;Obtain a translation.&quot;, value = &quot;/translation/source/{src}/target/{target}/text/{text}&quot;)
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = &quot;Successfully obtained translation.&quot;),
-            @ApiResponse(code = 400, message = &quot;Bad request.&quot;),
-            @ApiResponse(code = 500, message = &quot;Internal server error.&quot;) 
-    })
+    
+    @Timed
+    @GetMapping(value = &quot;/source/{src}/target/{target}/text/{text}&quot;)
     public ResponseEntity&lt;Translation&gt; obtainTranslation(@PathVariable(&quot;src&quot;) String source,
             @PathVariable(&quot;target&quot;) String target, @PathVariable(&quot;text&quot;) String text) {
-<span class="nc" id="L105">        return ResponseEntity.ok(translationService.obtainTranslation(source, target, text));</span>
+<span class="nc" id="L118">        return ResponseEntity.ok(translationService.obtainTranslation(source, target, text));</span>
     }
 
+    @Timed
     // convenience, uses a configurable default locale
-    @RequestMapping(value = &quot;/target/{target}/text/{text}&quot;, method = RequestMethod.GET)
-    @ApiOperation(httpMethod = &quot;GET&quot;, notes = &quot;Obtain a translation using default locale.&quot;, value = &quot;/translation/target/{target}/text/{text}&quot;)
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = &quot;Successfully obtained translation.&quot;),
-            @ApiResponse(code = 400, message = &quot;Bad request.&quot;),
-            @ApiResponse(code = 500, message = &quot;Internal server error.&quot;) 
-    })
+    @GetMapping(value = &quot;/target/{target}/text/{text}&quot;)
     public ResponseEntity&lt;Translation&gt; obtainTranslation(@PathVariable(&quot;target&quot;) String target,
             @PathVariable(&quot;text&quot;) String text) {
-<span class="nc" id="L118">        return ResponseEntity.ok(translationService.obtainTranslation(defaultLocale, target, text));</span>
+<span class="nc" id="L126">        return ResponseEntity.ok(translationService.obtainTranslation(defaultLocale, target, text));</span>
     }
 
+    @Timed
     // convenience, source x n target combinations for a text
-    @RequestMapping(value = &quot;/source/{src}/targets/{targets}/text/{text}&quot;, method = RequestMethod.GET)
-    @ApiOperation(httpMethod = &quot;GET&quot;, notes = &quot;Obtain translations for each target locale.&quot;, value = &quot;/translation/source/{src}/targets/{targets}/text/{text}&quot;)
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = &quot;Obtained translations.  (Report errors with any target).&quot;),
-            @ApiResponse(code = 400, message = &quot;Bad request.&quot;),
-            @ApiResponse(code = 500, message = &quot;Internal server error.&quot;) 
-    })
+    @GetMapping(value = &quot;/source/{src}/targets/{targets}/text/{text}&quot;)
     public ResponseEntity&lt;Translations&gt; obtainTranslations(@PathVariable(&quot;src&quot;) String source,
             @PathVariable(&quot;targets&quot;) String targets, @PathVariable(&quot;text&quot;) String text, HttpServletRequest request) {
-<span class="nc" id="L131">        return fetchTranslations(source, targets, text, request);</span>
+<span class="nc" id="L134">        return fetchTranslations(source, targets, text, request);</span>
     }
 
+    @Timed
     // convenience, default configurable locale x n target combinations for a text
-    @RequestMapping(value = &quot;/targets/{targets}/text/{text}&quot;, method = RequestMethod.GET)
-    @ApiOperation(httpMethod = &quot;GET&quot;, notes = &quot;Obtain translations for each target locale using default locale.&quot;, value = &quot;/translation/targets/{targets}/text/{text}&quot;)
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = &quot;Obtained translations.  (Report errors with any target).&quot;),
-            @ApiResponse(code = 400, message = &quot;Bad request.&quot;),
-            @ApiResponse(code = 500, message = &quot;Internal server error.&quot;) 
-    })
+    @GetMapping(value = &quot;/targets/{targets}/text/{text}&quot;)
     public ResponseEntity&lt;Translations&gt; obtainTranslations(@PathVariable(&quot;targets&quot;) String targets,
             @PathVariable(&quot;text&quot;) String text, HttpServletRequest request) {
-<span class="nc" id="L144">        return fetchTranslations(defaultLocale, targets, text, request);</span>
+<span class="nc" id="L142">        return fetchTranslations(defaultLocale, targets, text, request);</span>
     }
 
+    @Timed
     // most flexible option
-    @RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
-    @ApiOperation(httpMethod = &quot;POST&quot;, notes = &quot;Obtain translations.&quot;, value = &quot;/translation/&quot;)
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = &quot;Obtained translations.  (Report errors with any source-target-text combination).&quot;),
-            @ApiResponse(code = 400, message = &quot;Bad request.&quot;),
-            @ApiResponse(code = 500, message = &quot;Internal server error.&quot;) 
-    })
+    @PostMapping(value = &quot;/&quot;)
     public ResponseEntity&lt;Translations&gt; obtainTranslations(@RequestBody TranslationRequest[] translationRequests,
             HttpServletRequest request) {
-<span class="nc" id="L157">        return fetchTranslations(translationRequests, request);</span>
+<span class="nc" id="L150">        return fetchTranslations(translationRequests, request);</span>
     }
 
-    @RequestMapping(value = &quot;/source/{src}/target/{target}/text/{text}&quot;, method = RequestMethod.DELETE)
-    @ApiOperation(httpMethod = &quot;DELETE&quot;, notes = &quot;Evict cache-key for a previously obtained translation.&quot;, value = &quot;/translation/source/{src}/target/{target}/text/{text}&quot;)
-    @ApiResponses(value = { 
-            @ApiResponse(code = 204, message = &quot;Successfully evicted key.&quot;),
-            @ApiResponse(code = 500, message = &quot;Internal server error.&quot;) 
-    })
+    @Timed
+    @DeleteMapping(value = &quot;/source/{src}/target/{target}/text/{text}&quot;)
     public ResponseEntity&lt;?&gt; invalidateCacheKey(@PathVariable(&quot;src&quot;) String source,
             @PathVariable(&quot;target&quot;) String target, @PathVariable(&quot;text&quot;) String text) {
-<span class="nc" id="L168">        cacheService.evictTranslation(source, target, text);</span>
-<span class="nc" id="L169">        log.info(String.format(&quot;Evicted cache key for /source/%s/target/%s/text/%s&quot;, source, target, text));</span>
-<span class="nc" id="L170">        return ResponseEntity.noContent().build();</span>
+<span class="nc" id="L157">        cacheService.evictTranslation(source, target, text);</span>
+<span class="nc" id="L158">        log.info(String.format(&quot;Evicted cache key for /source/%s/target/%s/text/%s&quot;, source, target, text));</span>
+<span class="nc" id="L159">        return ResponseEntity.noContent().build();</span>
     }
 
     
     @ExceptionHandler({ IllegalArgumentException.class, TranslationException.class })
     protected ResponseEntity&lt;ErrorResponse&gt; badRequest(Exception e, HttpServletRequest hsr) {
-<span class="nc" id="L176">        ErrorResponse er = new ErrorResponse(hsr.getMethod(), hsr.getRequestURI(), hsr.getQueryString(),</span>
-<span class="nc" id="L177">                e.getMessage());</span>
-<span class="nc" id="L178">        log.error(er.asLog());</span>
-<span class="nc" id="L179">        return ResponseEntity.badRequest().body(er);</span>
+<span class="nc" id="L165">        ErrorResponse er = new ErrorResponse(hsr.getMethod(), hsr.getRequestURI(), hsr.getQueryString(),</span>
+<span class="nc" id="L166">                e.getMessage());</span>
+<span class="nc" id="L167">        log.error(er.asLog());</span>
+<span class="nc" id="L168">        return ResponseEntity.badRequest().body(er);</span>
     }
 
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
