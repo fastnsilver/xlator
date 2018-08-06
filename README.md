@@ -190,6 +190,9 @@ Assumes a `gh-pages` (orphan) branch has been set up in advance.  In addition, a
 mvn scm-publish:publish-scm -Pdocumentation
 ```
 
+> I spent a couple hours troubleshooting failed attempts to publish my Maven Site.  This Stack Overflow [record](https://stackoverflow.com/questions/42335599/please-tell-me-who-you-are-when-using-ssh-key/42335651) got me over the hump.  Even if you have multiple Github accounts managed in `{user.home}/.ssh/config`, you must still declare `--global` with `user.name` and `user.email` in order for the plugin to succeed.  
+
+
 #### Review
 
 * [Maven Site](http://fastnsilver.github.io/xlator/)
