@@ -21,8 +21,8 @@ export APP_LIMITS_TRANSLATIONS_PER_REQUEST=100
 # Be sure to register for an account on http://frengly.com before attempting to use this service!
 # You should update the configuration below, adding email and password values matching a valid pair of credentials.
 
-export APP_FRENGLY_EMAIL=fastnsilver@gmail.com
-export APP_FRENGLY_PASSWORD=redFish#1
+export APP_FRENGLY_EMAIL=
+export APP_FRENGLY_PASSWORD=
   
 # OPTION 2: GOOGLE TRANSLATE
 # Another pay-for option is the Google Translate API (@see https://cloud.google.com/translate/v2/using_rest).
