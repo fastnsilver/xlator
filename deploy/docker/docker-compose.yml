@@ -54,20 +54,20 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE}
-      ***REMOVED***
+      # Pick an ISO 639-1 code for locale (e.g., en for English)
       - APP_DEFAULTS_LOCALE=${APP_DEFAULTS_LOCALE}
-      ***REMOVED***
+      # Default service choices are: frengly, google
       - APP_DEFAULTS_SERVICE=${APP_DEFAULTS_SERVICE}
-      ***REMOVED***
+      # Choose a number <= 100
       - APP_LIMITS_TRANSLATIONS_PER_REQUEST=${APP_LIMITS_TRANSLATIONS_PER_REQUEST}
-      ***REMOVED***
-      ***REMOVED***
-      ***REMOVED***
+      # OPTION 1: FRENGLY
+      # Be sure to register for an account on http://frengly.com before attempting to use this service!
+      # You should update the configuration below, adding email and password values matching a valid pair of credentials.
       - APP_FRENGLY_EMAIL=${APP_FRENGLY_EMAIL}
       - APP_FRENGLY_PASSWORD=${APP_FRENGLY_PASSWORD}
-      ***REMOVED***
-      ***REMOVED***
-      ***REMOVED***
-      ***REMOVED***
+      # OPTION 2: GOOGLE TRANSLATE
+      # Another pay-for option is the Google Translate API (@see https://cloud.google.com/translate/v2/using_rest).
+      # Update (and uncomment) the configuration below to add your API key.  
+      # Be sure to comment out the lines that start with APP_FRENGLY above if you wish to employ the Google Translate API instead.
       - APP_GOOGLE_KEY=${APP_GOOGLE_KEY}
 

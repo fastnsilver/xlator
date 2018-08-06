@@ -1,7 +1,7 @@
-***REMOVED***
+#!/usr/bin/env bash
 
 # Shuts down Xlator service
 
-***REMOVED***
+set -e
 
 docker-compose down

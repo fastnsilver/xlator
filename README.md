@@ -138,7 +138,7 @@ Pull the xlator image
 
 ##### Run images
 
-You will have to set some environment variables in [xlator.env](https://github.com/fastnsilver/xlator/blob/master/deploy/docker/xlator.env) first!
+You will have to set some environment variables in [startup.sh](https://github.com/fastnsilver/xlator/blob/master/deploy/docker/startup.sh) first!
 
 ```
 cd deploy/docker
