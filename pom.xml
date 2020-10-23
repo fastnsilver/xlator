@@ -68,7 +68,7 @@
                 
         <!-- Third-party library versions -->
         <commons-lang3.version>3.7</commons-lang3.version>
-        <guava.version>25.1-jre</guava.version>
+        <guava.version>30.0-android</guava.version>
         <jackson.version>2.9.6</jackson.version>
         <jedis.version>2.8.1</jedis.version>
         <jsr305.version>3.0.1</jsr305.version>
